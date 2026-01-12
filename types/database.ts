@@ -15,7 +15,6 @@ export interface Participant {
   id: string;
   race_id: string;
   name: string;
-  avatar: string | null;
   items_eaten: number;
   team: string | null;
   created_at: string;
