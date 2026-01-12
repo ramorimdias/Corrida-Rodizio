@@ -32,6 +32,15 @@ const MOTIVATIONAL_PHRASES = [
   "O vice-campeão também ganha... a conta!",
   "Treino é treino, rodízio é jogo!",
   "Guerreiro(a), mas o estômago não ajudou!",
+  "A vitória escapou, mas a conta chegou igual!",
+  "Hoje o campeão foi o garçom!",
+  "Faltou gás no final, mas o começo foi histórico!",
+  "Seu estômago entrou em modo economia de energia!",
+  "A competição acabou, a digestão começou!",
+  "Não foi derrota, foi estratégia de sobrevivência!",
+  "Seu limite foi atingido antes do garçom!",
+  "O campeão come mais, mas você comeu bem!",
+  "Derrota honrosa: saiu andando, não rolando!",
 ];
 
 export default function RoomPage() {
