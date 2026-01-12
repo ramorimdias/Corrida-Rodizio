@@ -17,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { UserPlus } from "lucide-react"
-import { defaultAvatar } from "@/lib/utils/avatars"
 
 interface AddParticipantDialogProps {
   raceId: string
@@ -37,7 +36,6 @@ export function AddParticipantDialog({ raceId, onParticipantAdded }: AddParticip
     const { error } = await supabase.from("participants").insert({
       race_id: raceId,
       name,
-      avatar: defaultAvatar,
       items_eaten: 0,
     })
 

@@ -20,7 +20,6 @@ import type { FoodType } from "@/types/database";
 import { generateRoomCode } from "@/lib/utils/room-code";
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { defaultAvatar } from "@/lib/utils/avatars";
 
 export default function Home() {
   const router = useRouter();
@@ -108,7 +107,6 @@ export default function Home() {
         .insert({
           race_id: race.id,
           name: playerName,
-          avatar: defaultAvatar,
           items_eaten: 0,
           team: teamModeEnabled ? selectedTeam : null,
         })
@@ -203,7 +201,6 @@ export default function Home() {
         .insert({
           race_id: race.id,
           name: playerName,
-          avatar: defaultAvatar,
           items_eaten: 0,
           team: raceIsTeamMode ? selectedTeam : null,
         })
