@@ -83,11 +83,12 @@ export default function Home() {
     setLoading(true);
     try {
       const supabase = createClient();
+      const normalizedRoomCode = roomCode.toUpperCase();
 
       const { data: race, error: raceError } = await supabase
         .from("races")
         .select()
-        .eq("room_code", roomCode.toUpperCase())
+        .eq("room_code", normalizedRoomCode)
         .eq("is_active", true)
         .single();
 
@@ -97,6 +98,28 @@ export default function Home() {
         return;
       }
 
+      // Check if a participant with the same name already exists
+      const { data: matchingParticipant, error: matchingParticipantError } =
+        await supabase
+          .from("participants")
+          .select("id")
+          .eq("race_id", race.id)
+          .eq("name", playerName.trim())
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+
+      if (!matchingParticipantError && matchingParticipant) {
+        // Persist existing participant id locally and redirect
+        localStorage.setItem(
+          getParticipantStorageKey(normalizedRoomCode),
+          matchingParticipant.id
+        );
+        router.push(`/sala/${normalizedRoomCode}`);
+        return;
+      }
+
+      // Add participant
       const { data: participant, error: participantError } = await supabase
         .from("participants")
         .insert({
@@ -111,12 +134,12 @@ export default function Home() {
 
       if (participant) {
         localStorage.setItem(
-          getParticipantStorageKey(roomCode.toUpperCase()),
+          getParticipantStorageKey(normalizedRoomCode),
           participant.id
         );
       }
 
-      router.push(`/sala/${roomCode.toUpperCase()}`);
+      router.push(`/sala/${normalizedRoomCode}`);
     } catch (error) {
       console.error("Erro ao entrar na sala:", error);
       alert("Erro ao entrar na sala. Tente novamente.");
