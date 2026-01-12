@@ -156,7 +156,7 @@ export default function Home() {
     } catch (error) {
       console.error("Erro ao criar sala:", error);
       alert(
-        "Erro ao criar sala. Verifique se o seu Banco de Dados possui as colunas 'is_team_mode' e 'team'."
+        "Erro ao criar sala. Verifique se o seu Banco de Dados possui as colunas necessárias (is_team_mode, team, avatar, is_vip)."
       );
     } finally {
       setLoading(false);
@@ -264,7 +264,9 @@ export default function Home() {
       router.push(`/sala/${normalizedRoomCode}`);
     } catch (error) {
       console.error("Erro ao entrar na sala:", error);
-      alert("Erro ao entrar na sala. Tente novamente.");
+      alert(
+        "Erro ao entrar na sala. Verifique se o seu Banco de Dados possui as colunas necessárias (team, avatar, is_vip)."
+      );
     } finally {
       setLoading(false);
     }
