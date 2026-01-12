@@ -18,6 +18,8 @@ import {
   Flag,
   Instagram,
   Home,
+  Users2,
+  Sword,
 } from "lucide-react";
 import type { Race, Participant, FoodType } from "@/types/database";
 import { FoodIcon } from "@/components/food-icon";
@@ -26,8 +28,8 @@ import confetti from "canvas-confetti";
 
 const MOTIVATIONAL_PHRASES = [
   "O importante é que a barriga está cheia!",
-  "Na próxima você pede reforço! ",
-  "Faltou um espacinho para a sobremesa? ",
+  "Na próxima você pede reforço!",
+  "Faltou um espacinho para a sobremesa?",
   "O estômago é o limite, mas hoje você parou antes!",
   "O vice-campeão também ganha... a conta!",
   "Treino é treino, rodízio é jogo!",
@@ -208,12 +210,22 @@ export default function RoomPage() {
 
   if (!race) return null;
 
-  // VIEW: TELA DE RESULTADOS (HALL OF FAME / INSTAGRAM)
+  // CALCULOS DE EQUIPE E RANKING
+  const teamAScore = participants
+    .filter((p) => p.team === "A")
+    .reduce((acc, p) => acc + p.items_eaten, 0);
+  const teamBScore = participants
+    .filter((p) => p.team === "B")
+    .reduce((acc, p) => acc + p.items_eaten, 0);
+  const maxScore =
+    participants.length > 0
+      ? Math.max(...participants.map((p) => p.items_eaten))
+      : 0;
+
+  // VIEW: TELA DE RESULTADOS (HALL OF FAME)
   if (!race.is_active) {
-    const maxScore =
-      participants.length > 0
-        ? Math.max(...participants.map((p) => p.items_eaten))
-        : 0;
+    const winningTeam =
+      teamAScore > teamBScore ? "A" : teamBScore > teamAScore ? "B" : "Empate";
 
     return (
       <div className="min-h-screen bg-zinc-950 text-white p-6 flex flex-col items-center justify-center animate-in fade-in duration-1000">
@@ -232,10 +244,42 @@ export default function RoomPage() {
             </div>
           </div>
 
+          {/* ANÚNCIO DE EQUIPE VENCEDORA */}
+          {race.is_team_mode && (
+            <Card
+              className={`border-none ${
+                winningTeam === "A"
+                  ? "bg-primary/20"
+                  : winningTeam === "B"
+                  ? "bg-destructive/20"
+                  : "bg-muted/20"
+              }`}
+            >
+              <CardContent className="p-6 text-center space-y-2">
+                <Badge
+                  variant="outline"
+                  className="uppercase font-black tracking-widest text-[10px]"
+                >
+                  Resultado por Equipe
+                </Badge>
+                <h2 className="text-2xl font-black italic">
+                  {winningTeam === "Empate"
+                    ? "EMPATE TÉCNICO!"
+                    : winningTeam === "A"
+                    ? "TIME ALPHA VENCEU!"
+                    : "TIME BETA VENCEU!"}
+                </h2>
+                <div className="flex justify-center gap-8 text-sm font-bold opacity-70">
+                  <span>ALPHA: {teamAScore}</span>
+                  <span>BETA: {teamBScore}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="space-y-4">
             {participants.map((p, i) => {
               const isWinner = p.items_eaten === maxScore && maxScore > 0;
-
               return (
                 <div
                   key={p.id}
@@ -254,8 +298,19 @@ export default function RoomPage() {
                       #{i + 1}
                     </span>
                     <div>
-                      <p className="font-bold text-xl leading-tight">
+                      <p className="font-bold text-xl leading-tight flex items-center gap-2">
                         {p.name}
+                        {race.is_team_mode && (
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded ${
+                              p.team === "A"
+                                ? "bg-primary/30 text-primary"
+                                : "bg-destructive/30 text-destructive"
+                            }`}
+                          >
+                            {p.team === "A" ? "ALPHA" : "BETA"}
+                          </span>
+                        )}
                       </p>
                       <p className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">
                         {isWinner
@@ -291,23 +346,20 @@ export default function RoomPage() {
                 Print & Post
               </span>
             </div>
-
-            <div className="flex gap-3 w-full">
-              <Button
-                variant="outline"
-                className="flex-1 rounded-2xl border-white/10 bg-white/5 hover:bg-white/10"
-                onClick={() => router.push("/")}
-              >
-                <Home className="h-4 w-4 mr-2" /> Início
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              className="w-full rounded-2xl border-white/10 bg-white/5 hover:bg-white/10"
+              onClick={() => router.push("/")}
+            >
+              <Home className="h-4 w-4 mr-2" /> Início
+            </Button>
           </div>
         </div>
       </div>
     );
   }
 
-  // VIEW: SALA ATIVA (O código original abaixo permanece o mesmo para a competição em curso)
+  // VIEW: SALA ATIVA
   const currentParticipant = participants.find(
     (p) => p.id === currentParticipantId
   );
@@ -343,6 +395,18 @@ export default function RoomPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-lg">{participant.name}</span>
+                  {race.is_team_mode && (
+                    <Badge
+                      variant="outline"
+                      className={`text-[9px] h-4 px-1.5 ${
+                        participant.team === "A"
+                          ? "border-primary text-primary"
+                          : "border-destructive text-destructive"
+                      }`}
+                    >
+                      {participant.team === "A" ? "ALPHA" : "BETA"}
+                    </Badge>
+                  )}
                   {participant.id === currentParticipantId && !isPersonal && (
                     <Badge className="bg-primary/10 text-primary border-none text-[10px] h-5 uppercase">
                       Você
@@ -411,7 +475,7 @@ export default function RoomPage() {
             onClick={endRace}
             disabled={isEnding}
           >
-            <Flag className="h-4 w-4" />
+            <Flag className="h-4 w-4" />{" "}
             {isEnding ? "Encerrando..." : "Encerrar Competição"}
           </Button>
 
@@ -438,6 +502,38 @@ export default function RoomPage() {
             </Button>
           </div>
         </div>
+
+        {/* PLACAR COLETIVO (Modo Equipe) */}
+        {race.is_team_mode && (
+          <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top duration-500">
+            <Card className="border-l-4 border-l-primary bg-primary/5">
+              <CardContent className="p-4 flex flex-col items-center">
+                <div className="flex items-center gap-2 text-primary mb-1">
+                  <Sword className="h-3 w-3" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">
+                    Time Alpha
+                  </span>
+                </div>
+                <span className="text-4xl font-black tracking-tighter">
+                  {teamAScore}
+                </span>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-destructive bg-destructive/5">
+              <CardContent className="p-4 flex flex-col items-center">
+                <div className="flex items-center gap-2 text-destructive mb-1">
+                  <Sword className="h-3 w-3" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">
+                    Time Beta
+                  </span>
+                </div>
+                <span className="text-4xl font-black tracking-tighter">
+                  {teamBScore}
+                </span>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         <div className="text-center space-y-4 py-4">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-card shadow-xl border border-muted mb-2">
@@ -487,7 +583,7 @@ export default function RoomPage() {
             {participants.length <= 1 && (
               <div className="py-12 text-center bg-card/40 rounded-3xl border border-dashed border-muted">
                 <p className="text-sm font-medium text-muted-foreground italic">
-                  Aguardando rivais entrarem com o código...
+                  Aguardando rivais entrarem...
                 </p>
               </div>
             )}

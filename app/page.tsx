@@ -7,7 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Pizza, Fish, Beef, Trophy, ArrowRight, Hash } from "lucide-react";
+import {
+  Pizza,
+  Fish,
+  Beef,
+  Trophy,
+  ArrowRight,
+  Hash,
+  Users2,
+} from "lucide-react";
 import type { FoodType } from "@/types/database";
 import { generateRoomCode } from "@/lib/utils/room-code";
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
@@ -21,13 +29,16 @@ export default function Home() {
   const [roomCode, setRoomCode] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ESTADOS DO MODO EQUIPE
+  const [isTeamMode, setIsTeamMode] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState<"A" | "B">("A");
+
   const foodTypes = [
     { type: "pizza" as FoodType, label: "Pizza", icon: Pizza },
     { type: "sushi" as FoodType, label: "Japa", icon: Fish },
     { type: "burger" as FoodType, label: "Burger", icon: Beef },
   ];
 
-  // Lógica de Criação de Sala reconectada
   const handleCreateRoom = async () => {
     if (!playerName.trim() || !selectedFood) return;
 
@@ -36,7 +47,7 @@ export default function Home() {
       const supabase = createClient();
       const code = generateRoomCode();
 
-      // Criar a corrida
+      // Criar a corrida com a nova flag is_team_mode
       const { data: race, error: raceError } = await supabase
         .from("races")
         .insert({
@@ -44,19 +55,20 @@ export default function Home() {
           food_type: selectedFood,
           room_code: code,
           is_active: true,
+          is_team_mode: isTeamMode,
         })
         .select()
         .single();
 
       if (raceError) throw raceError;
 
-      // Adicionar o criador como primeiro participante
       const { data: participant, error: participantError } = await supabase
         .from("participants")
         .insert({
           race_id: race.id,
           name: playerName,
           items_eaten: 0,
+          team: isTeamMode ? selectedTeam : null,
         })
         .select()
         .single();
@@ -70,13 +82,14 @@ export default function Home() {
       router.push(`/sala/${code}`);
     } catch (error) {
       console.error("Erro ao criar sala:", error);
-      alert("Erro ao criar sala. Tente novamente.");
+      alert(
+        "Erro ao criar sala. Verifique se o seu Banco de Dados possui as colunas 'is_team_mode' e 'team'."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Lógica de Entrada em Sala reconectada
   const handleJoinRoom = async () => {
     if (!playerName.trim() || !roomCode.trim()) return;
 
@@ -98,7 +111,6 @@ export default function Home() {
         return;
       }
 
-      // Check if a participant with the same name already exists
       const { data: matchingParticipant, error: matchingParticipantError } =
         await supabase
           .from("participants")
@@ -110,7 +122,6 @@ export default function Home() {
           .single();
 
       if (!matchingParticipantError && matchingParticipant) {
-        // Persist existing participant id locally and redirect
         localStorage.setItem(
           getParticipantStorageKey(normalizedRoomCode),
           matchingParticipant.id
@@ -119,13 +130,14 @@ export default function Home() {
         return;
       }
 
-      // Add participant
+      // Adicionar participante com o time selecionado (caso a sala seja modo equipe)
       const { data: participant, error: participantError } = await supabase
         .from("participants")
         .insert({
           race_id: race.id,
           name: playerName,
           items_eaten: 0,
+          team: race.is_team_mode ? selectedTeam : null,
         })
         .select()
         .single();
@@ -155,7 +167,6 @@ export default function Home() {
           <ThemeToggle />
         </div>
 
-        {/* Header Visual Premium */}
         <div className="text-center space-y-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary shadow-lg shadow-primary/20 rotate-3 hover:rotate-0 transition-transform duration-300">
             <Trophy className="h-8 w-8 text-white" />
@@ -172,7 +183,6 @@ export default function Home() {
 
         <Card className="border-none shadow-2xl shadow-black/5 bg-card/80 backdrop-blur-md">
           <CardContent className="pt-8 space-y-8">
-            {/* Nome do Jogador */}
             <div className="space-y-3">
               <Label
                 htmlFor="playerName"
@@ -189,9 +199,81 @@ export default function Home() {
               />
             </div>
 
+            {(isTeamMode || showJoinRoom) && (
+              <div className="space-y-3 animate-in fade-in duration-500">
+                <Label className="text-xs uppercase tracking-widest font-bold text-muted-foreground px-1">
+                  Escolha seu Time
+                </Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    type="button"
+                    variant={selectedTeam === "A" ? "default" : "outline"}
+                    className={`h-12 rounded-xl font-bold transition-all ${
+                      selectedTeam === "A"
+                        ? "ring-2 ring-primary ring-offset-2"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedTeam("A")}
+                  >
+                    Time Alpha
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={selectedTeam === "B" ? "destructive" : "outline"}
+                    className={`h-12 rounded-xl font-bold transition-all ${
+                      selectedTeam === "B"
+                        ? "ring-2 ring-destructive ring-offset-2"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedTeam("B")}
+                  >
+                    Time Beta
+                  </Button>
+                </div>
+                {showJoinRoom && (
+                  <p className="text-[10px] text-center text-muted-foreground uppercase font-medium">
+                    Nota: Se a sala não for em equipe, seu time será ignorado.
+                  </p>
+                )}
+              </div>
+            )}
+
             {!showJoinRoom ? (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-                {/* Seleção de Categoria */}
+                <div
+                  onClick={() => setIsTeamMode(!isTeamMode)}
+                  className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
+                    isTeamMode
+                      ? "bg-primary/5 border-primary/20 shadow-inner"
+                      : "bg-background border-muted hover:border-primary/20"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Users2
+                      className={`h-5 w-5 ${
+                        isTeamMode ? "text-primary" : "text-muted-foreground"
+                      }`}
+                    />
+                    <div className="text-left">
+                      <p className="text-sm font-bold">Modo Equipes</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">
+                        Disputa Coletiva
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`w-10 h-6 rounded-full relative transition-colors ${
+                      isTeamMode ? "bg-primary" : "bg-muted"
+                    }`}
+                  >
+                    <div
+                      className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-all ${
+                        isTeamMode ? "left-5" : "left-1"
+                      }`}
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   <Label className="text-xs uppercase tracking-widest font-bold text-muted-foreground px-1">
                     Escolha a Categoria
@@ -222,7 +304,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Ações Criar */}
                 <div className="pt-2 space-y-4">
                   <Button
                     size="lg"
@@ -244,7 +325,6 @@ export default function Home() {
               </div>
             ) : (
               <div className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-500">
-                {/* Código da Sala */}
                 <div className="space-y-3">
                   <Label
                     htmlFor="roomCode"
@@ -266,7 +346,6 @@ export default function Home() {
                     />
                   </div>
                 </div>
-                {/* Ações Entrar */}
                 <div className="space-y-3">
                   <Button
                     className="w-full h-14 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:translate-y-[-2px]"
