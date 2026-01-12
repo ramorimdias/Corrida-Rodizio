@@ -24,6 +24,7 @@ import {
 import type { Race, Participant, FoodType } from "@/types/database";
 import { FoodIcon } from "@/components/food-icon";
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
+import { avatarOptions, defaultAvatar } from "@/lib/avatars";
 import confetti from "canvas-confetti";
 
 const MOTIVATIONAL_PHRASES = [
@@ -143,8 +144,27 @@ export default function RoomPage() {
     }
   };
 
+  const updateAvatar = async (participantId: string, avatar: string) => {
+    if (participantId !== currentParticipantId) return;
+    setParticipants((prev) =>
+      prev.map((participant) =>
+        participant.id === participantId ? { ...participant, avatar } : participant
+      )
+    );
+    try {
+      const supabase = createClient();
+      await supabase
+        .from("participants")
+        .update({ avatar })
+        .eq("id", participantId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const endRace = async () => {
     if (!race) return;
+    if (!isCurrentVip) return;
     setIsEnding(true);
     try {
       const supabase = createClient();
@@ -211,6 +231,14 @@ export default function RoomPage() {
   if (!race) return null;
 
   // CALCULOS DE EQUIPE E RANKING
+  const vipParticipant =
+    participants.find((participant) => participant.is_vip) ??
+    [...participants].sort(
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    )[0];
+  const isCurrentVip =
+    Boolean(currentParticipantId) && vipParticipant?.id === currentParticipantId;
   const teamAScore = participants
     .filter((p) => p.team === "A")
     .reduce((acc, p) => acc + p.items_eaten, 0);
@@ -280,6 +308,8 @@ export default function RoomPage() {
           <div className="space-y-4">
             {participants.map((p, i) => {
               const isWinner = p.items_eaten === maxScore && maxScore > 0;
+              const avatar = p.avatar ?? defaultAvatar;
+              const isVip = p.id === vipParticipant?.id;
               return (
                 <div
                   key={p.id}
@@ -297,9 +327,17 @@ export default function RoomPage() {
                     >
                       #{i + 1}
                     </span>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 border border-white/10 text-lg">
+                      {avatar}
+                    </div>
                     <div>
                       <p className="font-bold text-xl leading-tight flex items-center gap-2">
                         {p.name}
+                        {isVip && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-300 uppercase font-bold tracking-wide">
+                            VIP
+                          </span>
+                        )}
                         {race.is_team_mode && (
                           <span
                             className={`text-[10px] px-1.5 py-0.5 rounded ${
@@ -370,6 +408,8 @@ export default function RoomPage() {
     isPersonal = false
   ) => {
     const isLeader = index === 0 && participant.items_eaten > 0;
+    const avatar = participant.avatar ?? defaultAvatar;
+    const isVip = participant.id === vipParticipant?.id;
     return (
       <Card
         className={`overflow-hidden border-none transition-all duration-300 ${
@@ -392,9 +432,17 @@ export default function RoomPage() {
               >
                 {isLeader ? <Trophy className="h-5 w-5" /> : index + 1}
               </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-background border border-muted text-lg shadow-sm">
+                {avatar}
+              </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-lg">{participant.name}</span>
+                  {isVip && (
+                    <Badge className="bg-yellow-400/10 text-yellow-600 border-none text-[10px] h-5 uppercase">
+                      VIP
+                    </Badge>
+                  )}
                   {race.is_team_mode && (
                     <Badge
                       variant="outline"
@@ -451,6 +499,25 @@ export default function RoomPage() {
               )}
             </div>
           </div>
+          {isPersonal && participant.id === currentParticipantId && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              {avatarOptions.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => updateAvatar(participant.id, option)}
+                  className={`flex h-9 w-9 items-center justify-center rounded-full border text-lg transition-all ${
+                    option === avatar
+                      ? "border-primary bg-primary/10 shadow-inner"
+                      : "border-muted bg-background hover:border-primary/40"
+                  }`}
+                  aria-label={`Selecionar avatar ${option}`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -468,16 +535,18 @@ export default function RoomPage() {
             <ArrowLeft className="h-4 w-4 mr-2" /> Sair
           </Button>
 
-          <Button
-            variant="destructive"
-            size="sm"
-            className="rounded-xl font-bold gap-2 shadow-lg shadow-destructive/20"
-            onClick={endRace}
-            disabled={isEnding}
-          >
-            <Flag className="h-4 w-4" />{" "}
-            {isEnding ? "Encerrando..." : "Encerrar Competição"}
-          </Button>
+          {isCurrentVip && (
+            <Button
+              variant="destructive"
+              size="sm"
+              className="rounded-xl font-bold gap-2 shadow-lg shadow-destructive/20"
+              onClick={endRace}
+              disabled={isEnding}
+            >
+              <Flag className="h-4 w-4" />{" "}
+              {isEnding ? "Encerrando..." : "Encerrar Competição"}
+            </Button>
+          )}
 
           <div className="flex items-center gap-2">
             <div className="text-right hidden sm:block">
