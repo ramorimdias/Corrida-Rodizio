@@ -11,6 +11,7 @@ import { Pizza, Fish, Beef, Utensils, ArrowRight } from "lucide-react"
 import type { FoodType } from "@/types/database"
 import { generateRoomCode } from "@/lib/utils/room-code"
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function Home() {
   const router = useRouter()
@@ -129,6 +130,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 dark:from-orange-950/20 dark:via-red-950/20 dark:to-yellow-950/20 p-4 md:p-8">
       <div className="mx-auto max-w-2xl space-y-8">
+        <div className="flex justify-end">
+          <ThemeToggle />
+        </div>
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-red-500 mb-4">
