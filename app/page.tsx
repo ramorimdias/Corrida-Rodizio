@@ -20,6 +20,7 @@ import type { FoodType } from "@/types/database";
 import { generateRoomCode } from "@/lib/utils/room-code";
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { defaultAvatar } from "@/lib/avatars";
 
 export default function Home() {
   const router = useRouter();
@@ -102,38 +103,50 @@ export default function Home() {
 
       if (raceError) throw raceError;
 
+      let participantPayload: Record<string, unknown> = {
+        race_id: race.id,
+        name: playerName,
+        avatar: defaultAvatar,
+        is_vip: true,
+        items_eaten: 0,
+        team: teamModeEnabled ? selectedTeam : null,
+      };
+
       let { data: participant, error: participantError } = await supabase
         .from("participants")
-        .insert({
-          race_id: race.id,
-          name: playerName,
-          items_eaten: 0,
-          team: teamModeEnabled ? selectedTeam : null,
-        })
+        .insert(participantPayload)
         .select()
         .single();
 
-      if (participantError && isMissingColumn(participantError, "team")) {
-        const fallback = await supabase
+      let fallbackAttempts = 0;
+      while (
+        participantError &&
+        fallbackAttempts < 3 &&
+        ["team", "avatar", "is_vip"].some((column) =>
+          isMissingColumn(participantError, column)
+        )
+      ) {
+        ["team", "avatar", "is_vip"].forEach((column) => {
+          if (isMissingColumn(participantError, column)) {
+            delete participantPayload[column];
+          }
+        });
+        ({ data: participant, error: participantError } = await supabase
           .from("participants")
-          .insert({
-            race_id: race.id,
-            name: playerName,
-            avatar: defaultAvatar,
-            items_eaten: 0,
-          })
+          .insert(participantPayload)
           .select()
-          .single();
-        participant = fallback.data;
-        participantError = fallback.error;
-        if (teamModeEnabled) {
+          .single());
+        fallbackAttempts += 1;
+      }
+
+      if (participantError) {
+        if (teamModeEnabled && isMissingColumn(participantError, "team")) {
           alert(
             "Modo equipes indisponível: coluna 'team' não encontrada. Entrando sem time."
           );
         }
+        throw participantError;
       }
-
-      if (participantError) throw participantError;
 
       if (participant) {
         localStorage.setItem(getParticipantStorageKey(code), participant.id);
@@ -143,7 +156,7 @@ export default function Home() {
     } catch (error) {
       console.error("Erro ao criar sala:", error);
       alert(
-        "Erro ao criar sala. Verifique se o seu Banco de Dados possui as colunas 'is_team_mode' e 'team'."
+        "Erro ao criar sala. Verifique se o seu Banco de Dados possui as colunas necessárias (is_team_mode, team, avatar, is_vip)."
       );
     } finally {
       setLoading(false);
@@ -196,38 +209,50 @@ export default function Home() {
           : false;
 
       // Adicionar participante com o time selecionado (caso a sala seja modo equipe)
+      let participantPayload: Record<string, unknown> = {
+        race_id: race.id,
+        name: playerName,
+        avatar: defaultAvatar,
+        is_vip: false,
+        items_eaten: 0,
+        team: raceIsTeamMode ? selectedTeam : null,
+      };
+
       let { data: participant, error: participantError } = await supabase
         .from("participants")
-        .insert({
-          race_id: race.id,
-          name: playerName,
-          items_eaten: 0,
-          team: raceIsTeamMode ? selectedTeam : null,
-        })
+        .insert(participantPayload)
         .select()
         .single();
 
-      if (participantError && isMissingColumn(participantError, "team")) {
-        const fallback = await supabase
+      let fallbackAttempts = 0;
+      while (
+        participantError &&
+        fallbackAttempts < 3 &&
+        ["team", "avatar", "is_vip"].some((column) =>
+          isMissingColumn(participantError, column)
+        )
+      ) {
+        ["team", "avatar", "is_vip"].forEach((column) => {
+          if (isMissingColumn(participantError, column)) {
+            delete participantPayload[column];
+          }
+        });
+        ({ data: participant, error: participantError } = await supabase
           .from("participants")
-          .insert({
-            race_id: race.id,
-            name: playerName,
-            avatar: defaultAvatar,
-            items_eaten: 0,
-          })
+          .insert(participantPayload)
           .select()
-          .single();
-        participant = fallback.data;
-        participantError = fallback.error;
-        if (raceIsTeamMode) {
+          .single());
+        fallbackAttempts += 1;
+      }
+
+      if (participantError) {
+        if (raceIsTeamMode && isMissingColumn(participantError, "team")) {
           alert(
             "Modo equipes indisponível: coluna 'team' não encontrada. Entrando sem time."
           );
         }
+        throw participantError;
       }
-
-      if (participantError) throw participantError;
 
       if (participant) {
         localStorage.setItem(
@@ -239,7 +264,9 @@ export default function Home() {
       router.push(`/sala/${normalizedRoomCode}`);
     } catch (error) {
       console.error("Erro ao entrar na sala:", error);
-      alert("Erro ao entrar na sala. Tente novamente.");
+      alert(
+        "Erro ao entrar na sala. Verifique se o seu Banco de Dados possui as colunas necessárias (team, avatar, is_vip)."
+      );
     } finally {
       setLoading(false);
     }
