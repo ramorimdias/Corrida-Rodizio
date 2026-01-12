@@ -48,7 +48,6 @@ export default function Home() {
     ].filter(Boolean);
     return (
       maybeError.code === "42703" ||
-      maybeError.code === "PGRST204" ||
       haystack.some((text) => text?.includes(column))
     );
   };
