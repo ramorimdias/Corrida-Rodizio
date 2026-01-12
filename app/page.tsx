@@ -33,14 +33,18 @@ export default function Home() {
   // ESTADOS DO MODO EQUIPE
   const [isTeamMode, setIsTeamMode] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<"A" | "B">("A");
-  const isMissingColumn = (error: unknown, column: string) => {
-    if (!error || typeof error !== "object") return false;
-    const maybeError = error as {
+  const getErrorMeta = (error: unknown) => {
+    if (!error || typeof error !== "object") return {};
+    return error as {
       code?: string;
       message?: string;
       details?: string;
       hint?: string;
     };
+  };
+  const isMissingColumn = (error: unknown, column: string) => {
+    if (!error || typeof error !== "object") return false;
+    const maybeError = getErrorMeta(error);
     const haystack = [
       maybeError.message,
       maybeError.details,
@@ -50,6 +54,53 @@ export default function Home() {
       maybeError.code === "42703" ||
       haystack.some((text) => text?.includes(column))
     );
+  };
+  const isDuplicateRoomCode = (error: unknown) => {
+    const maybeError = getErrorMeta(error);
+    const haystack = [
+      maybeError.message,
+      maybeError.details,
+      maybeError.hint,
+    ]
+      .filter(Boolean)
+      .map((text) => text?.toLowerCase());
+    return (
+      maybeError.code === "23505" ||
+      haystack.some(
+        (text) => text?.includes("room_code") && text?.includes("duplicate")
+      )
+    );
+  };
+  const isPermissionError = (error: unknown) => {
+    const maybeError = getErrorMeta(error);
+    const haystack = [
+      maybeError.message,
+      maybeError.details,
+      maybeError.hint,
+    ]
+      .filter(Boolean)
+      .map((text) => text?.toLowerCase());
+    return (
+      maybeError.code === "42501" ||
+      haystack.some((text) =>
+        text?.includes("permission") || text?.includes("row level security")
+      )
+    );
+  };
+  const getCreateRoomErrorMessage = (error: unknown) => {
+    if (
+      isMissingColumn(error, "is_team_mode") ||
+      isMissingColumn(error, "team")
+    ) {
+      return "Erro ao criar sala. Verifique se o seu Banco de Dados possui as colunas 'is_team_mode' e 'team'.";
+    }
+    if (isDuplicateRoomCode(error)) {
+      return "Código de sala já existe. Tente novamente.";
+    }
+    if (isPermissionError(error)) {
+      return "Permissão negada ao criar sala. Verifique as regras de segurança (RLS) do Supabase.";
+    }
+    return "Erro ao criar sala. Tente novamente.";
   };
 
   const foodTypes = [
@@ -144,9 +195,7 @@ export default function Home() {
       router.push(`/sala/${code}`);
     } catch (error) {
       console.error("Erro ao criar sala:", error);
-      alert(
-        "Erro ao criar sala. Verifique se o seu Banco de Dados possui as colunas 'is_team_mode' e 'team'."
-      );
+      alert(getCreateRoomErrorMessage(error));
     } finally {
       setLoading(false);
     }
