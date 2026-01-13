@@ -26,7 +26,7 @@ export default function Home() {
   const router = useRouter();
   const [playerName, setPlayerName] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodType | null>(null);
-  const [showJoinRoom, setShowJoinRoom] = useState(false);
+  const [flow, setFlow] = useState<"create" | "join" | null>(null);
   const [roomCode, setRoomCode] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -362,22 +362,44 @@ export default function Home() {
         <Card className="border-none shadow-2xl shadow-black/5 bg-card/80 backdrop-blur-md">
           <CardContent className="pt-8 space-y-8">
             <div className="space-y-3">
-              <Label
-                htmlFor="playerName"
-                className="text-xs uppercase tracking-widest font-bold text-muted-foreground px-1"
-              >
-                Seu Codinome
-              </Label>
-              <Input
-                id="playerName"
-                placeholder="Ex: Predador de Pizza"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                className="bg-background/50 border-muted focus:ring-primary/20 h-14 text-lg font-medium"
-              />
+              {flow ? (
+                <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <Label
+                    htmlFor="playerName"
+                    className="text-xs uppercase tracking-widest font-bold text-muted-foreground px-1"
+                  >
+                    Seu Codinome
+                  </Label>
+                  <Input
+                    id="playerName"
+                    placeholder="Ex: Predador de Pizza"
+                    value={playerName}
+                    onChange={(e) => setPlayerName(e.target.value)}
+                    className="bg-background/50 border-muted focus:ring-primary/20 h-14 text-lg font-medium"
+                  />
+                </div>
+              ) : null}
             </div>
 
-            {!showJoinRoom ? (
+            {!flow ? (
+              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                <Button
+                  size="lg"
+                  className="w-full h-14 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:translate-y-[-2px] active:scale-95"
+                  onClick={() => setFlow("create")}
+                >
+                  Criar Competição
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full h-14 rounded-xl font-semibold text-muted-foreground hover:text-primary border-muted"
+                  onClick={() => setFlow("join")}
+                >
+                  Já tem um código? Entrar na sala
+                </Button>
+              </div>
+            ) : flow === "create" ? (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div
                   onClick={() => setIsTeamMode(!isTeamMode)}
@@ -456,9 +478,19 @@ export default function Home() {
                   <Button
                     variant="ghost"
                     className="w-full h-12 font-semibold text-muted-foreground hover:text-primary"
-                    onClick={() => setShowJoinRoom(true)}
+                    onClick={() => setFlow("join")}
                   >
                     Já tem um código? Entrar na sala
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-muted-foreground"
+                    onClick={() => {
+                      setFlow(null);
+                      setSelectedFood(null);
+                    }}
+                  >
+                    Voltar
                   </Button>
                 </div>
               </div>
@@ -489,7 +521,7 @@ export default function Home() {
                   <Button
                     className="w-full h-14 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:translate-y-[-2px]"
                     onClick={handleJoinRoom}
-                    disabled={!roomCode.trim() || loading}
+                    disabled={!playerName.trim() || !roomCode.trim() || loading}
                   >
                     {loading ? "Localizando..." : "Entrar na Arena"}
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -498,11 +530,12 @@ export default function Home() {
                     variant="ghost"
                     className="w-full text-muted-foreground"
                     onClick={() => {
-                      setShowJoinRoom(false);
+                      setFlow(null);
+                      setSelectedFood(null);
                       setRoomCode("");
                     }}
                   >
-                    Voltar para criação
+                    Voltar
                   </Button>
                 </div>
               </div>
