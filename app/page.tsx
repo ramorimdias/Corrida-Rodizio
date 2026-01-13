@@ -20,6 +20,7 @@ import type { FoodType } from "@/types/database";
 import { generateRoomCode } from "@/lib/utils/room-code";
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { DEFAULT_AVATAR } from "@/lib/utils/avatars";
 
 export default function Home() {
   const router = useRouter();
@@ -49,6 +50,74 @@ export default function Home() {
       maybeError.code === "42703" ||
       haystack.some((text) => text?.includes(column))
     );
+  };
+
+  const insertParticipantWithFallback = async (
+    supabase: ReturnType<typeof createClient>,
+    payload: {
+      race_id: string;
+      name: string;
+      items_eaten: number;
+      team: "A" | "B" | null;
+      avatar: string;
+      is_vip: boolean;
+    }
+  ) => {
+    let { data, error } = await supabase
+      .from("participants")
+      .insert(payload)
+      .select()
+      .single();
+
+    if (
+      error &&
+      (isMissingColumn(error, "team") ||
+        isMissingColumn(error, "avatar") ||
+        isMissingColumn(error, "is_vip"))
+    ) {
+      const fallbackPayload: Record<string, unknown> = {
+        race_id: payload.race_id,
+        name: payload.name,
+        items_eaten: payload.items_eaten,
+      };
+      if (!isMissingColumn(error, "team")) {
+        fallbackPayload.team = payload.team;
+      }
+      if (!isMissingColumn(error, "avatar")) {
+        fallbackPayload.avatar = payload.avatar;
+      }
+      if (!isMissingColumn(error, "is_vip")) {
+        fallbackPayload.is_vip = payload.is_vip;
+      }
+      const fallback = await supabase
+        .from("participants")
+        .insert(fallbackPayload)
+        .select()
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    }
+
+    if (
+      error &&
+      (isMissingColumn(error, "team") ||
+        isMissingColumn(error, "avatar") ||
+        isMissingColumn(error, "is_vip"))
+    ) {
+      const minimal = await supabase
+        .from("participants")
+        .insert({
+          race_id: payload.race_id,
+          name: payload.name,
+          items_eaten: payload.items_eaten,
+        })
+        .select()
+        .single();
+      data = minimal.data;
+      error = minimal.error;
+    }
+
+    return { data, error };
   };
 
   const foodTypes = [
@@ -109,26 +178,41 @@ export default function Home() {
           name: playerName,
           items_eaten: 0,
           team: teamModeEnabled ? selectedTeam : null,
+          avatar: DEFAULT_AVATAR,
+          is_vip: true,
         })
         .select()
         .single();
 
-      if (participantError && isMissingColumn(participantError, "team")) {
-        const fallback = await supabase
-          .from("participants")
-          .insert({
-            race_id: race.id,
-            name: playerName,
-            avatar: defaultAvatar,
-            items_eaten: 0,
-          })
-          .select()
-          .single();
+      if (
+        participantError &&
+        (isMissingColumn(participantError, "team") ||
+          isMissingColumn(participantError, "avatar") ||
+          isMissingColumn(participantError, "is_vip"))
+      ) {
+        const fallback = await insertParticipantWithFallback(supabase, {
+          race_id: race.id,
+          name: playerName,
+          items_eaten: 0,
+          team: teamModeEnabled ? selectedTeam : null,
+          avatar: DEFAULT_AVATAR,
+          is_vip: true,
+        });
         participant = fallback.data;
         participantError = fallback.error;
-        if (teamModeEnabled) {
+        if (teamModeEnabled && isMissingColumn(participantError, "team")) {
           alert(
             "Modo equipes indisponível: coluna 'team' não encontrada. Entrando sem time."
+          );
+        }
+        if (isMissingColumn(participantError, "avatar")) {
+          alert(
+            "Avatar indisponível: coluna 'avatar' não encontrada. Entrando sem avatar."
+          );
+        }
+        if (isMissingColumn(participantError, "is_vip")) {
+          alert(
+            "VIP indisponível: coluna 'is_vip' não encontrada. Entrando sem VIP."
           );
         }
       }
@@ -143,7 +227,7 @@ export default function Home() {
     } catch (error) {
       console.error("Erro ao criar sala:", error);
       alert(
-        "Erro ao criar sala. Verifique se o seu Banco de Dados possui as colunas 'is_team_mode' e 'team'."
+        "Erro ao criar sala. Verifique se o seu Banco de Dados possui as colunas 'is_team_mode', 'team', 'avatar' e 'is_vip'."
       );
     } finally {
       setLoading(false);
@@ -203,26 +287,36 @@ export default function Home() {
           name: playerName,
           items_eaten: 0,
           team: raceIsTeamMode ? selectedTeam : null,
+          avatar: DEFAULT_AVATAR,
+          is_vip: false,
         })
         .select()
         .single();
 
-      if (participantError && isMissingColumn(participantError, "team")) {
-        const fallback = await supabase
-          .from("participants")
-          .insert({
-            race_id: race.id,
-            name: playerName,
-            avatar: defaultAvatar,
-            items_eaten: 0,
-          })
-          .select()
-          .single();
+      if (
+        participantError &&
+        (isMissingColumn(participantError, "team") ||
+          isMissingColumn(participantError, "avatar") ||
+          isMissingColumn(participantError, "is_vip"))
+      ) {
+        const fallback = await insertParticipantWithFallback(supabase, {
+          race_id: race.id,
+          name: playerName,
+          items_eaten: 0,
+          team: raceIsTeamMode ? selectedTeam : null,
+          avatar: DEFAULT_AVATAR,
+          is_vip: false,
+        });
         participant = fallback.data;
         participantError = fallback.error;
-        if (raceIsTeamMode) {
+        if (raceIsTeamMode && isMissingColumn(participantError, "team")) {
           alert(
             "Modo equipes indisponível: coluna 'team' não encontrada. Entrando sem time."
+          );
+        }
+        if (isMissingColumn(participantError, "avatar")) {
+          alert(
+            "Avatar indisponível: coluna 'avatar' não encontrada. Entrando sem avatar."
           );
         }
       }

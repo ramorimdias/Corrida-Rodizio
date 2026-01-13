@@ -24,6 +24,7 @@ import {
 import type { Race, Participant, FoodType } from "@/types/database";
 import { FoodIcon } from "@/components/food-icon";
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
+import { AVATAR_OPTIONS, DEFAULT_AVATAR } from "@/lib/utils/avatars";
 import confetti from "canvas-confetti";
 
 const MOTIVATIONAL_PHRASES = [
@@ -58,6 +59,7 @@ export default function RoomPage() {
   const [currentParticipantId, setCurrentParticipantId] = useState<
     string | null
   >(null);
+  const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
 
   const getItemLabel = (foodType: FoodType, count: number) => {
     const labels = {
@@ -67,6 +69,9 @@ export default function RoomPage() {
     };
     return labels[foodType];
   };
+
+  const getAvatar = (participant: Participant) =>
+    participant.avatar || DEFAULT_AVATAR;
 
   const triggerConfetti = () => {
     const duration = 3 * 1000;
@@ -143,8 +148,31 @@ export default function RoomPage() {
     }
   };
 
+  const updateAvatar = async (avatar: string) => {
+    if (!currentParticipantId || isUpdatingAvatar) return;
+    setIsUpdatingAvatar(true);
+    setParticipants((prev) =>
+      prev.map((participant) =>
+        participant.id === currentParticipantId
+          ? { ...participant, avatar }
+          : participant
+      )
+    );
+    try {
+      const supabase = createClient();
+      await supabase
+        .from("participants")
+        .update({ avatar })
+        .eq("id", currentParticipantId);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUpdatingAvatar(false);
+    }
+  };
+
   const endRace = async () => {
-    if (!race) return;
+    if (!race || !currentParticipant?.is_vip) return;
     setIsEnding(true);
     try {
       const supabase = createClient();
@@ -290,6 +318,7 @@ export default function RoomPage() {
                   }`}
                 >
                   <div className="flex items-center gap-4 z-10">
+                    <div className="text-3xl">{getAvatar(p)}</div>
                     <span
                       className={`text-2xl font-black ${
                         isWinner ? "text-orange-500" : "text-zinc-700"
@@ -300,6 +329,11 @@ export default function RoomPage() {
                     <div>
                       <p className="font-bold text-xl leading-tight flex items-center gap-2">
                         {p.name}
+                        {p.is_vip && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300 uppercase font-black tracking-widest">
+                            VIP
+                          </span>
+                        )}
                         {race.is_team_mode && (
                           <span
                             className={`text-[10px] px-1.5 py-0.5 rounded ${
@@ -363,6 +397,7 @@ export default function RoomPage() {
   const currentParticipant = participants.find(
     (p) => p.id === currentParticipantId
   );
+  const canEndRace = Boolean(currentParticipant?.is_vip);
 
   const renderParticipantCard = (
     participant: Participant,
@@ -370,6 +405,7 @@ export default function RoomPage() {
     isPersonal = false
   ) => {
     const isLeader = index === 0 && participant.items_eaten > 0;
+    const avatar = getAvatar(participant);
     return (
       <Card
         className={`overflow-hidden border-none transition-all duration-300 ${
@@ -392,9 +428,15 @@ export default function RoomPage() {
               >
                 {isLeader ? <Trophy className="h-5 w-5" /> : index + 1}
               </div>
+              <div className="text-3xl">{avatar}</div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-lg">{participant.name}</span>
+                  {participant.is_vip && (
+                    <Badge className="bg-yellow-500/20 text-yellow-600 border-none text-[9px] h-4 uppercase">
+                      VIP
+                    </Badge>
+                  )}
                   {race.is_team_mode && (
                     <Badge
                       variant="outline"
@@ -451,6 +493,33 @@ export default function RoomPage() {
               )}
             </div>
           </div>
+          {isPersonal && participant.id === currentParticipantId && (
+            <div className="pt-4 border-t border-muted/40 mt-4 space-y-2">
+              <Label className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground">
+                Escolha seu avatar
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {AVATAR_OPTIONS.map((option) => {
+                  const isSelected = option === avatar;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => updateAvatar(option)}
+                      className={`w-10 h-10 rounded-xl border transition-all text-lg flex items-center justify-center ${
+                        isSelected
+                          ? "border-primary ring-2 ring-primary/40 bg-primary/10"
+                          : "border-muted hover:border-primary/40"
+                      }`}
+                      aria-pressed={isSelected}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -468,16 +537,18 @@ export default function RoomPage() {
             <ArrowLeft className="h-4 w-4 mr-2" /> Sair
           </Button>
 
-          <Button
-            variant="destructive"
-            size="sm"
-            className="rounded-xl font-bold gap-2 shadow-lg shadow-destructive/20"
-            onClick={endRace}
-            disabled={isEnding}
-          >
-            <Flag className="h-4 w-4" />{" "}
-            {isEnding ? "Encerrando..." : "Encerrar Competição"}
-          </Button>
+          {canEndRace && (
+            <Button
+              variant="destructive"
+              size="sm"
+              className="rounded-xl font-bold gap-2 shadow-lg shadow-destructive/20"
+              onClick={endRace}
+              disabled={isEnding}
+            >
+              <Flag className="h-4 w-4" />{" "}
+              {isEnding ? "Encerrando..." : "Encerrar Competição"}
+            </Button>
+          )}
 
           <div className="flex items-center gap-2">
             <div className="text-right hidden sm:block">

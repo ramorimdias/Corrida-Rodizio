@@ -15,6 +15,8 @@ export interface Participant {
   id: string;
   race_id: string;
   name: string;
+  avatar: string | null;
+  is_vip: boolean | null;
   items_eaten: number;
   team: string | null;
   created_at: string;
