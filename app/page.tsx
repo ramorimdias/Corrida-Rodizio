@@ -306,7 +306,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-100/50 via-background to-background dark:from-purple-950/50 dark:via-black dark:to-black p-6 md:p-12 transition-colors duration-500">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-orange-100/50 via-background to-background dark:from-purple-950/50 dark:via-black dark:to-black p-6 md:p-12 transition-colors duration-500">
       <div className="mx-auto max-w-xl space-y-12">
         <div className="flex justify-end">
           <ThemeToggle />
