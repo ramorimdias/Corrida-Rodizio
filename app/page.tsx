@@ -111,45 +111,28 @@ export default function Home() {
   // --- LÓGICA DE CONTA ---
 
   const handleCreateLogin = async () => {
-    // 1. Validação básica: agora exigimos nome e senha
-    if (!accountCodeInput.trim() || !accountPassword.trim()) {
-      alert("Por favor, preencha o nome de usuário e a senha.");
-      return;
-    }
-
+    if (!accountPassword.trim() || !accountCodeInput.trim()) return;
     setAccountLoading(true);
     setGroupsError(null);
-
     try {
       const supabase = createClient();
       const chosenName = accountCodeInput.trim().toUpperCase();
 
-      // Chamamos a função RPC enviando o nome escolhido em 'p_code'
       const { data, error } = await supabase.rpc("create_login", {
-        p_code: chosenName,
+        p_username: chosenName,
         p_password: accountPassword,
       });
 
-      if (error) {
-        console.error("Erro Supabase:", error);
-        throw error; // Lança para o catch tratar a mensagem
-      }
+      if (error) throw error;
 
       setLoginCode(data);
       localStorage.setItem(LOGIN_STORAGE_KEY, data);
       setAccountFlow(null);
       setAccountPassword("");
       setAccountCodeInput("");
-      alert(
-        "Conta criada com sucesso! Use este nome para salvar seu histórico."
-      );
+      alert("Conta criada com sucesso!");
     } catch (error: any) {
-      console.error("Erro detalhado:", error);
-      // Extrai a mensagem real do erro (ex: 'usuário já existe')
-      const msg =
-        error.message ||
-        (typeof error === "object" ? JSON.stringify(error) : error);
-      alert(`Erro ao criar conta: ${msg}`);
+      alert(`Erro ao criar conta: ${error.message || "Tente outro nome"}`);
     } finally {
       setAccountLoading(false);
     }
@@ -158,13 +141,12 @@ export default function Home() {
   const handleLogin = async () => {
     if (!accountCodeInput.trim() || !accountPassword.trim()) return;
     setAccountLoading(true);
-
     try {
       const supabase = createClient();
       const normalizedName = accountCodeInput.trim().toUpperCase();
 
       const { data, error } = await supabase.rpc("verify_login", {
-        p_code: normalizedName,
+        p_username: normalizedName, // Nome do parâmetro corrigido para o banco
         p_password: accountPassword,
       });
 
@@ -179,12 +161,79 @@ export default function Home() {
       setAccountPassword("");
       setAccountCodeInput("");
 
-      // Carrega o histórico de partidas deste usuário
-      handleLoadGroups();
+      handleLoadGroups(normalizedName);
     } catch (error: any) {
       alert("Erro ao entrar. Tente novamente.");
     } finally {
       setAccountLoading(false);
+    }
+  };
+
+  const handleLoadGroups = async (usernameOverride?: string) => {
+    const codeToUse = usernameOverride || loginCode;
+    if (!codeToUse) return;
+
+    setIsLoadingGroups(true);
+    setGroupsError(null);
+
+    try {
+      const supabase = createClient();
+
+      // Buscamos os participantes vinculados ao seu login_code
+      const { data, error } = await supabase
+        .from("participants")
+        .select(
+          `
+        items_eaten,
+        races (
+          id,
+          name,
+          room_code,
+          food_type,
+          is_active,
+          created_at
+        )
+      `
+        )
+        .eq("login_code", codeToUse);
+
+      if (error) throw error;
+
+      // --- LÓGICA DE DEDUPLICAÇÃO ---
+      // Usamos um Map para agrupar as participações pelo ID da Sala (races.id)
+      const historyMap = new Map();
+
+      data?.forEach((item: any) => {
+        const race = item.races;
+        // Garante que pegamos o objeto da sala, tratando se vier como array ou objeto
+        const raceData = Array.isArray(race) ? race[0] : race;
+
+        if (raceData && raceData.id) {
+          // Se a sala ainda não está no mapa OU se este registro novo tem mais itens comidos
+          if (
+            !historyMap.has(raceData.id) ||
+            item.items_eaten > historyMap.get(raceData.id).items_eaten
+          ) {
+            historyMap.set(raceData.id, {
+              ...raceData,
+              items_eaten: item.items_eaten,
+            });
+          }
+        }
+      });
+
+      // Converte o Mapa de volta para Array e ordena pela data de criação (mais recentes primeiro)
+      const history = Array.from(historyMap.values()).sort(
+        (a: any, b: any) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      setMyGroups(history);
+    } catch (error) {
+      console.error("Erro ao carregar histórico:", error);
+      setGroupsError("Não foi possível carregar seu histórico.");
+    } finally {
+      setIsLoadingGroups(false);
     }
   };
 
@@ -193,39 +242,6 @@ export default function Home() {
     setMyGroups([]);
     localStorage.removeItem(LOGIN_STORAGE_KEY);
   };
-
-  const handleLoadGroups = async (forcedCode?: string) => {
-    const codeToUse = forcedCode || loginCode;
-    if (!codeToUse) return;
-
-    setIsLoadingGroups(true);
-    try {
-      const supabase = createClient();
-      const { data: rows } = await supabase
-        .from("participants")
-        .select("race_id")
-        .eq("login_code", codeToUse);
-
-      const ids = Array.from(new Set((rows || []).map((r) => r.race_id)));
-      if (ids.length === 0) {
-        setMyGroups([]);
-        return;
-      }
-
-      const { data } = await supabase
-        .from("races")
-        .select()
-        .in("id", ids)
-        .order("created_at", { ascending: false });
-
-      setMyGroups(data || []);
-    } catch (e) {
-      setGroupsError("Erro ao carregar histórico.");
-    } finally {
-      setIsLoadingGroups(false);
-    }
-  };
-
   // --- LÓGICA DAS SALAS ---
 
   const handleCreateRoom = async () => {

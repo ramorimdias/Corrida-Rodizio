@@ -10,7 +10,7 @@ export function StartActions({ onSetFlow }: StartActionsProps) {
     <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <Button
         size="lg"
-        className="w-full h-14 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:translate-y-[-2px] active:scale-95"
+        className="w-full h-14 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:translate-y-0.5px active:scale-95"
         onClick={() => onSetFlow("create")}
       >
         Criar Competição

@@ -1,8 +1,8 @@
+// components/home/account-section.tsx
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn, LogOut } from "lucide-react";
-import { Race } from "@/types/database";
 
 interface AccountSectionProps {
   loginCode: string | null;
@@ -10,7 +10,7 @@ interface AccountSectionProps {
   accountLoading: boolean;
   accountCodeInput: string;
   accountPassword: string;
-  myGroups: Race[];
+  myGroups: any[]; // Alterado para any[] pois agora inclui items_eaten e dados da sala
   isLoadingGroups: boolean;
   groupsError: string | null;
   onLogout: () => void;
@@ -66,37 +66,57 @@ export function AccountSection({
           <Button
             variant="outline"
             className="w-full h-12 rounded-xl font-semibold"
-            onClick={onLoadGroups}
+            onClick={() => onLoadGroups()}
             disabled={isLoadingGroups}
           >
-            {isLoadingGroups ? "Carregando..." : "Meus grupos"}
+            {isLoadingGroups ? "Carregando..." : "Ver Histórico de Competições"}
           </Button>
+
           {groupsError && (
             <p className="text-xs text-red-500 font-semibold">{groupsError}</p>
           )}
-          <div className="space-y-2">
-            {myGroups.map((group) => (
-              <div
-                key={group.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-muted/60 bg-background/70 px-4 py-3"
-              >
-                <div>
-                  <p className="text-sm font-bold">{group.name}</p>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                    Código {group.room_code}
-                  </p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-primary"
-                  onClick={() => router.push(`/sala/${group.room_code}`)}
+
+          {/* Renderização da lista - Só aparece se não estiver carregando e houver grupos */}
+          {myGroups.length > 0 && (
+            <div className="space-y-2 mt-4">
+              {myGroups.map((group: any) => (
+                <div
+                  key={group.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-muted/60 bg-background/70 px-4 py-3 hover:border-primary/40 transition-colors"
                 >
-                  Entrar
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold">{group.name}</p>
+                      {!group.is_active && (
+                        <span className="text-[8px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground uppercase font-black">
+                          Encerrada
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                      {group.items_eaten}{" "}
+                      {group.food_type === "pizza"
+                        ? "pedaços"
+                        : group.food_type === "sushi"
+                        ? "peças"
+                        : "burgers"}{" "}
+                      • Sala {group.room_code}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant={group.is_active ? "ghost" : "outline"}
+                    className={
+                      group.is_active ? "text-primary font-bold" : "text-xs h-8"
+                    }
+                    onClick={() => router.push(`/sala/${group.room_code}`)}
+                  >
+                    {group.is_active ? "Entrar" : "Ver Placar"}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ) : accountFlow ? (
         <div className="space-y-4 rounded-2xl border border-muted/60 bg-background/60 p-4">
@@ -161,7 +181,7 @@ export function AccountSection({
                 </Label>
                 <Input
                   id="newUsername"
-                  placeholder="Ex: VINECO"
+                  placeholder="Ex: João Silva"
                   value={accountCodeInput}
                   onChange={(e) => setAccountCodeInput(e.target.value)}
                   className="h-12 text-lg font-bold"
