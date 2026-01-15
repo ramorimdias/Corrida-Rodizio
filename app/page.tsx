@@ -313,7 +313,8 @@ export default function Home() {
   };
 
   const handleJoinRoom = async () => {
-    if (!playerName.trim() || !roomCode.trim()) return;
+    const normalizedName = loginCode?.trim() || playerName.trim();
+    if (!normalizedName || !roomCode.trim()) return;
     setLoading(true);
     try {
       const supabase = createClient();
@@ -334,7 +335,7 @@ export default function Home() {
         .from("participants")
         .select("id")
         .eq("race_id", race.id)
-        .eq("name", playerName.trim())
+        .eq("name", normalizedName)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -353,7 +354,7 @@ export default function Home() {
       const { data: participant, error: pError } =
         await insertParticipantWithFallback(supabase, {
           race_id: race.id,
-          name: playerName,
+          name: normalizedName,
           items_eaten: 0,
           team: null,
           avatar: DEFAULT_AVATAR,
@@ -435,6 +436,7 @@ export default function Home() {
                 setPlayerName={setPlayerName}
                 roomCode={roomCode}
                 setRoomCode={setRoomCode}
+                loginCode={loginCode}
                 loading={loading}
                 onJoin={handleJoinRoom}
                 onBack={() => {
