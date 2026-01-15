@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Flag, Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface RoomHeaderProps {
   roomCode: string;
@@ -9,7 +10,7 @@ interface RoomHeaderProps {
   isEnding: boolean;
   copied: boolean;
   onExit: () => void;
-  onEndRace: () => void; // Esta função vem da página pai
+  onEndRace: () => void;
   onCopyCode: () => void;
 }
 
@@ -46,6 +47,7 @@ export function RoomHeader({
       )}
 
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         <div className="text-right">
           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
             Sala

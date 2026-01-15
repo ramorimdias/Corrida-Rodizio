@@ -11,7 +11,7 @@ import { RoomInfo } from "@/components/room/room-info";
 import { PersonalProgress } from "@/components/room/personal-progress";
 import { RankingSection } from "@/components/room/ranking-section";
 import { HallOfFame } from "@/components/room/hall-of-fame";
-import { TeamSelection } from "@/components/room/team-selection";
+import { RaceTrack } from "@/components/room/race-track";
 import { LoadingScreen } from "@/components/room/loading-screen";
 
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
@@ -183,6 +183,15 @@ export default function RoomPage() {
         />
 
         <RoomInfo race={race} participantsCount={participants.length} />
+
+        {participants.length > 0 && (
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-1">
+              Corrida em Tempo Real
+            </label>
+            <RaceTrack participants={participants} />
+          </div>
+        )}
 
         {currentParticipant && (
           <PersonalProgress
