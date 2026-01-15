@@ -17,6 +17,7 @@ import { LoadingScreen } from "@/components/room/loading-screen";
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
 import { Button } from "@/components/ui/button";
 import type { Race, Participant } from "@/types/database";
+import { TeamSelection } from "@/components/room/team-selection";
 
 export default function RoomPage() {
   const params = useParams();
@@ -96,6 +97,22 @@ export default function RoomPage() {
         .update({ avatar })
         .eq("id", currentParticipantId);
       // O Realtime atualizará o estado automaticamente
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUpdatingAvatar(false);
+    }
+  };
+
+  const updateTeam = async (teamId: string) => {
+    if (!currentParticipantId || isUpdatingAvatar) return;
+    setIsUpdatingAvatar(true);
+    try {
+      const supabase = createClient();
+      await supabase
+        .from("participants")
+        .update({ team: teamId })
+        .eq("id", currentParticipantId);
     } catch (error) {
       console.error(error);
     } finally {
@@ -189,9 +206,21 @@ export default function RoomPage() {
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-1">
               Corrida em Tempo Real
             </label>
-            <RaceTrack participants={participants} />
+            <RaceTrack
+              participants={participants}
+              isTeamMode={race.is_team_mode}
+            />
           </div>
         )}
+
+        {race.is_team_mode &&
+          currentParticipant &&
+          !currentParticipant.team && (
+            <TeamSelection
+              onUpdateTeam={updateTeam}
+              isUpdating={isUpdatingAvatar}
+            />
+          )}
 
         {currentParticipant && (
           <PersonalProgress

@@ -1,38 +1,40 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Sword } from "lucide-react";
-import { ParticipantItem } from "./participant-item";
+import { Sword, TrendingUp } from "lucide-react";
 import { Race, Participant } from "@/types/database";
 
-const TEAM_CONFIG = [
-  {
-    id: "AZUL",
+const TEAM_CONFIG = {
+  AZUL: {
     label: "Time Azul",
-    cardClass: "border-l-4 border-l-blue-500 bg-blue-500/5",
-    scoreClass: "text-blue-500",
+    color: "bg-blue-500",
+    text: "text-blue-500",
+    border: "border-l-blue-500",
+    bg: "bg-blue-500/5",
   },
-  {
-    id: "VERMELHA",
+  VERMELHA: {
     label: "Time Vermelho",
-    cardClass: "border-l-4 border-l-red-500 bg-red-500/5",
-    scoreClass: "text-red-500",
+    color: "bg-red-500",
+    text: "text-red-500",
+    border: "border-l-red-500",
+    bg: "bg-red-500/5",
   },
-  {
-    id: "VERDE",
+  VERDE: {
     label: "Time Verde",
-    cardClass: "border-l-4 border-l-emerald-500 bg-emerald-500/5",
-    scoreClass: "text-emerald-400",
+    color: "bg-emerald-500",
+    text: "text-emerald-400",
+    border: "border-l-emerald-500",
+    bg: "bg-emerald-500/5",
   },
-  {
-    id: "AMARELA",
+  AMARELA: {
     label: "Time Amarelo",
-    cardClass: "border-l-4 border-l-yellow-500 bg-yellow-500/5",
-    scoreClass: "text-yellow-400",
+    color: "bg-yellow-500",
+    text: "text-yellow-400",
+    border: "border-l-yellow-500",
+    bg: "bg-yellow-500/5",
   },
-];
+};
 
 interface RankingSectionProps {
   race: Race;
@@ -45,72 +47,97 @@ export function RankingSection({
   race,
   participants,
   currentParticipantId,
-  getItemLabel,
 }: RankingSectionProps) {
-  if (participants.length <= 1) {
-    return (
-      <div className="py-12 text-center bg-card/40 rounded-3xl border border-dashed border-muted">
-        <p className="text-sm font-medium text-muted-foreground italic">
-          Aguardando rivais entrarem...
-        </p>
-      </div>
-    );
-  }
+  if (participants.length <= 1) return null;
 
-  if (race.is_team_mode) {
-    return (
-      <div className="space-y-4">
-        {TEAM_CONFIG.map((team) => {
+  if (!race.is_team_mode) return null; // Individual é gerido pelo componente de itens
+
+  const totalScore = participants.reduce((acc, p) => acc + p.items_eaten, 0);
+
+  return (
+    <div className="space-y-6">
+      {/* CABO DE GUERRA MULTI-EQUIPAS */}
+      <div className="space-y-2 px-1">
+        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+          <span>Disputa por Equipas</span>
+          <span>{totalScore} Total</span>
+        </div>
+        <div className="h-4 w-full flex rounded-full overflow-hidden bg-muted/20 border border-white/5 shadow-inner">
+          {Object.entries(TEAM_CONFIG).map(([id, config]) => {
+            const teamPoints = participants
+              .filter((p) => p.team === id)
+              .reduce((acc, p) => acc + p.items_eaten, 0);
+            const width = totalScore > 0 ? (teamPoints / totalScore) * 100 : 0;
+            return width > 0 ? (
+              <div
+                key={id}
+                className={`h-full transition-all duration-1000 ${config.color}`}
+                style={{ width: `${width}%` }}
+              />
+            ) : null;
+          })}
+        </div>
+      </div>
+
+      {/* CARTÕES DAS EQUIPAS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {Object.entries(TEAM_CONFIG).map(([id, config]) => {
           const members = participants
-            .filter((p) => p.team === team.id)
+            .filter((p) => p.team === id)
             .sort((a, b) => b.items_eaten - a.items_eaten);
-          const total = members.reduce((acc, p) => acc + p.items_eaten, 0);
-          const topScore = members[0]?.items_eaten ?? 0;
+          const teamTotal = members.reduce((acc, p) => acc + p.items_eaten, 0);
+          const average =
+            members.length > 0 ? (teamTotal / members.length).toFixed(1) : "0";
 
           return (
             <Card
-              key={team.id}
-              className={`overflow-hidden border-none shadow-md ${team.cardClass}`}
+              key={id}
+              className={`border-none border-l-4 ${config.border} ${config.bg} shadow-md overflow-hidden`}
             >
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className={`flex items-center gap-2 ${team.scoreClass}`}>
-                    <Sword className="h-4 w-4" />
-                    <span className="text-[11px] font-black uppercase tracking-widest">
-                      {team.label}
+              <CardContent className="p-3 space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className={`flex items-center gap-1.5 ${config.text}`}>
+                    <Sword className="h-3 w-3" />
+                    <span className="text-[10px] font-black uppercase">
+                      {config.label}
                     </span>
                   </div>
-                  <span className="text-sm font-black uppercase tracking-widest text-muted-foreground">
-                    Total {total}
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  {members.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-muted/60 p-4 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                      Sem jogadores
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <TrendingUp className="h-3 w-3" />
+                      <span className="text-[9px] font-bold tracking-tighter">
+                        Méd. {average}
+                      </span>
                     </div>
-                  ) : (
-                    members.map((member) => (
-                      <div
-                        key={member.id}
-                        className="flex items-center justify-between rounded-2xl bg-background/70 px-3 py-2"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{member.avatar}</span>
-                          <span className="text-sm font-semibold">
-                            {member.name}
-                          </span>
-                          {member.id === currentParticipantId && (
-                            <Badge className="bg-primary/10 text-primary border-none text-[9px] h-4 uppercase">
-                              Você
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="text-sm font-black">
-                          {member.items_eaten}
-                        </div>
+                    <span className="text-xs font-black">{teamTotal}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  {members.map((m) => (
+                    <div
+                      key={m.id}
+                      className="flex items-center justify-between bg-background/50 rounded-lg px-2 py-1.5 border border-white/5"
+                    >
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <span className="text-sm shrink-0">{m.avatar}</span>
+                        <span
+                          className={`text-[11px] font-bold truncate ${
+                            m.id === currentParticipantId ? "text-primary" : ""
+                          }`}
+                        >
+                          {m.name.split(" ")[0]}
+                        </span>
                       </div>
-                    ))
+                      <span className="text-[11px] font-black opacity-60">
+                        {m.items_eaten}
+                      </span>
+                    </div>
+                  ))}
+                  {members.length === 0 && (
+                    <p className="text-[9px] text-center text-muted-foreground italic py-2">
+                      Sem jogadores
+                    </p>
                   )}
                 </div>
               </CardContent>
@@ -118,21 +145,6 @@ export function RankingSection({
           );
         })}
       </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      {participants.map((p, i) => (
-        <ParticipantItem
-          key={p.id}
-          participant={p}
-          index={i}
-          is_team_mode={false}
-          isPersonal={p.id === currentParticipantId}
-          getItemLabel={getItemLabel}
-        />
-      ))}
     </div>
   );
 }

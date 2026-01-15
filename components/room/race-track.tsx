@@ -4,11 +4,20 @@ import { Participant } from "@/types/database";
 import { Card } from "@/components/ui/card";
 import { Trophy, Timer } from "lucide-react";
 
+// Mapeamento de cores para manter a consistência com o restante do app
+const TEAM_COLORS: Record<string, string> = {
+  AZUL: "border-blue-500/50 text-blue-400 bg-blue-500/10",
+  VERMELHA: "border-red-500/50 text-red-400 bg-red-500/10",
+  VERDE: "border-emerald-500/50 text-emerald-400 bg-emerald-500/10",
+  AMARELA: "border-yellow-500/50 text-yellow-400 bg-yellow-500/10",
+};
+
 interface RaceTrackProps {
   participants: Participant[];
+  isTeamMode: boolean; // Adicionado para ativar o visual de times
 }
 
-export function RaceTrack({ participants }: RaceTrackProps) {
+export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
   const maxScore = Math.max(...participants.map((p) => p.items_eaten), 1);
 
   const sortedByEntry = [...participants].sort(
@@ -32,7 +41,8 @@ export function RaceTrack({ participants }: RaceTrackProps) {
         <div className="absolute top-0 left-0 right-0 h-1 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_8px,#fff_8px,#fff_16px)] opacity-30" />
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_8px,#fff_8px,#fff_16px)] opacity-30" />
 
-        <div className="py-6 pl-2 pr-3 space-y-1 relative min-h-[160px] bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:15px_15px]">
+        {/* pr-12 para garantir que o texto não corte no final da pista */}
+        <div className="py-6 pl-2 pr-12 space-y-1 relative min-h-[160px] bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:15px_15px]">
           <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-white/10" />
 
           <div
@@ -47,6 +57,12 @@ export function RaceTrack({ participants }: RaceTrackProps) {
             const progress = (participant.items_eaten / maxScore) * 100;
             const isLeader =
               participant.items_eaten === maxScore && maxScore > 0;
+
+            // Define o estilo baseado no time
+            const teamStyle =
+              isTeamMode && participant.team
+                ? TEAM_COLORS[participant.team as keyof typeof TEAM_COLORS]
+                : "border-white/5 bg-[#1a1a1a]/80 text-white";
 
             return (
               <div
@@ -74,13 +90,31 @@ export function RaceTrack({ participants }: RaceTrackProps) {
                     {isLeader && (
                       <Trophy className="absolute -top-3 -right-1 h-3 w-3 text-yellow-500 fill-yellow-500" />
                     )}
+
+                    {/* Pequeno indicador de cor acima do avatar (opcional) */}
+                    {isTeamMode && participant.team && (
+                      <div
+                        className={`absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full border border-black/50 ${TEAM_COLORS[
+                          participant.team
+                        ]
+                          .split(" ")
+                          .pop()}`}
+                      />
+                    )}
                   </div>
 
-                  <div className="flex flex-col min-w-0 bg-[#1a1a1a]/80 backdrop-blur-sm p-1 rounded border border-white/5">
-                    <span className="text-[8px] font-black uppercase text-white leading-none truncate max-w-[60px] md:max-w-[100px]">
+                  {/* Caixa de informações com a cor do time */}
+                  <div
+                    className={`flex flex-col min-w-0 backdrop-blur-sm p-1 rounded border transition-colors ${teamStyle}`}
+                  >
+                    <span className="text-[8px] font-black uppercase leading-none truncate max-w-[60px] md:max-w-[100px]">
                       {participant.name.split(" ")[0]}
                     </span>
-                    <span className="text-[10px] font-black text-primary italic leading-tight">
+                    <span
+                      className={`text-[10px] font-black italic leading-tight ${
+                        isTeamMode ? "" : "text-primary"
+                      }`}
+                    >
                       {participant.items_eaten}pts
                     </span>
                   </div>
