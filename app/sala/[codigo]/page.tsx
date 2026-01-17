@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Flag, Plus } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -30,8 +30,10 @@ export default function RoomPage() {
 
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const roomCodeRaw = params.codigo as string;
   const roomCode = roomCodeRaw.toUpperCase();
+  const isSpectator = searchParams.get("spectator") === "1";
 
   const [race, setRace] = useState<Race | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -216,8 +218,12 @@ export default function RoomPage() {
 
   useEffect(() => {
     loadRoomData();
-    const storedId = localStorage.getItem(getParticipantStorageKey(roomCode));
-    setCurrentParticipantId(storedId);
+    if (isSpectator) {
+      setCurrentParticipantId(null);
+    } else {
+      const storedId = localStorage.getItem(getParticipantStorageKey(roomCode));
+      setCurrentParticipantId(storedId);
+    }
 
     const supabase = createClient();
     const channel = supabase
@@ -243,7 +249,7 @@ export default function RoomPage() {
       }
       supabase.removeChannel(channel);
     };
-  }, [roomCode]);
+  }, [roomCode, isSpectator]);
 
   if (loading) return <LoadingScreen />;
   if (!race) return null;

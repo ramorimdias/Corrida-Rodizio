@@ -4,6 +4,7 @@ import { Trophy } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Participant, FoodType } from "@/types/database";
+import { isVehicleAvatar } from "@/lib/utils/avatars";
 
 // Opções de equipa para classes CSS
 const TEAM_OPTIONS = {
@@ -64,7 +65,17 @@ export function ParticipantItem({
             >
               {isLeader ? <Trophy className="h-4 w-4" /> : index + 1}
             </div>
-            <div className="text-2xl">{participant.avatar}</div>
+            <div className="text-2xl">
+              <span
+                className={
+                  isVehicleAvatar(participant.avatar)
+                    ? "inline-block -scale-x-100"
+                    : ""
+                }
+              >
+                {participant.avatar}
+              </span>
+            </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-base">{participant.name}</span>

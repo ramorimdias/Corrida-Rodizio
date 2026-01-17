@@ -30,6 +30,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isTeamMode, setIsTeamMode] = useState(false);
   const [hasEditedName, setHasEditedName] = useState(false);
+  const [isSpectator, setIsSpectator] = useState(false);
 
   // ESTADOS DE CONTA
   const [accountFlow, setAccountFlow] = useState<"login" | "create" | null>(
@@ -80,6 +81,7 @@ export default function Home() {
   useEffect(() => {
     if (flow === null) {
       setHasEditedName(false);
+      setIsSpectator(false);
     }
   }, [flow]);
 
@@ -338,7 +340,8 @@ export default function Home() {
 
   const handleJoinRoom = async () => {
     const normalizedName = playerName.trim();
-    if (!normalizedName || !roomCode.trim()) return;
+    if (!isSpectator && !normalizedName) return;
+    if (!roomCode.trim()) return;
     setLoading(true);
     try {
       const supabase = createClient();
@@ -353,6 +356,11 @@ export default function Home() {
         .single();
 
       if (raceError || !race) throw new Error("Sala não encontrada");
+
+      if (isSpectator) {
+        router.push(`/sala/${normalized}?spectator=1`);
+        return;
+      }
 
       // 2. Tentar encontrar um participante existente com este nome nesta sala
       const { data: existingParticipant } = await supabase
@@ -457,8 +465,9 @@ export default function Home() {
                   setPlayerName={handlePlayerNameChange}
                   roomCode={roomCode}
                   setRoomCode={setRoomCode}
-                  loginCode={loginCode}
                   loading={loading}
+                  isSpectator={isSpectator}
+                  setIsSpectator={setIsSpectator}
                   onJoin={handleJoinRoom}
                   onBack={() => {
                     setFlow(null);

@@ -2,9 +2,10 @@
 
 import { Participant } from "@/types/database";
 import { Card } from "@/components/ui/card";
+import { isVehicleAvatar } from "@/lib/utils/avatars";
 import { Trophy, Timer } from "lucide-react";
 
-// Mapeamento de cores para manter a consistência com o restante do app
+// Mapeamento de cores para manter a consistencia com o restante do app
 const TEAM_COLORS: Record<string, string> = {
   AZUL: "border-blue-500/50 text-blue-400 bg-blue-500/10",
   VERMELHA: "border-red-500/50 text-red-400 bg-red-500/10",
@@ -33,7 +34,7 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
           Corrida em Tempo Real - Live Race
         </div>
         <div className="text-[9px] font-bold text-muted-foreground uppercase bg-muted/50 px-2 py-0.5 rounded-full">
-          Líder: {maxScore}
+          Lider: {maxScore}
         </div>
       </div>
 
@@ -41,7 +42,7 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
         <div className="absolute top-0 left-0 right-0 h-1 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_8px,#fff_8px,#fff_16px)] opacity-30" />
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_8px,#fff_8px,#fff_16px)] opacity-30" />
 
-        {/* pr-12 para garantir que o texto não corte no final da pista */}
+        {/* pr-12 para garantir que o texto nao corte no final da pista */}
         <div className="py-6 pl-2 pr-12 space-y-1 relative min-h-[160px] bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:15px_15px]">
           <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-white/10" />
 
@@ -53,7 +54,7 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
             }}
           />
 
-          {sortedByEntry.map((participant, index) => {
+          {sortedByEntry.map((participant) => {
             const progress = (participant.items_eaten / maxScore) * 100;
             const isLeader =
               participant.items_eaten === maxScore && maxScore > 0;
@@ -72,18 +73,31 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
                 <div className="absolute bottom-0 left-2 right-2 h-px bg-white/5" />
 
                 <div
-                  className="absolute transition-all duration-1000 ease-in-out flex items-center gap-2"
+                  className="absolute transition-all duration-1000 ease-in-out flex items-center gap-0.5"
                   style={{
                     left: `${progress}%`,
                     transform: `translateX(-${progress}%)`,
                     zIndex: isLeader ? 20 : 10,
                   }}
                 >
+                  {/* Caixa de informacoes com a cor do time */}
+                  <div className="flex flex-col min-w-0 p-1 text-right text-white">
+                    <span className="text-[9px] font-black uppercase leading-none truncate max-w-[80px] md:max-w-[120px]">
+                      {participant.name.split(" ")[0]}
+                    </span>
+                    <span
+                      className={`text-[12px] font-black italic leading-tight ${
+                        isTeamMode ? "" : "text-primary"
+                      }`}
+                    >
+                      {participant.items_eaten}pts
+                    </span>
+                  </div>
                   <div className="relative shrink-0">
                     <span
                       className={`text-2xl md:text-3xl transition-transform ${
                         participant.items_eaten > 0 ? "animate-bounce" : ""
-                      }`}
+                      } ${isVehicleAvatar(participant.avatar) ? "-scale-x-100 inline-block" : ""}`}
                     >
                       {participant.avatar}
                     </span>
@@ -101,22 +115,6 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
                           .pop()}`}
                       />
                     )}
-                  </div>
-
-                  {/* Caixa de informações com a cor do time */}
-                  <div
-                    className={`flex flex-col min-w-0 backdrop-blur-sm p-1 rounded border transition-colors ${teamStyle}`}
-                  >
-                    <span className="text-[8px] font-black uppercase leading-none truncate max-w-[60px] md:max-w-[100px]">
-                      {participant.name.split(" ")[0]}
-                    </span>
-                    <span
-                      className={`text-[10px] font-black italic leading-tight ${
-                        isTeamMode ? "" : "text-primary"
-                      }`}
-                    >
-                      {participant.items_eaten}pts
-                    </span>
                   </div>
                 </div>
               </div>

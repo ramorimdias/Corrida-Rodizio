@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { AVATAR_OPTIONS } from "@/lib/utils/avatars";
+import { AVATAR_OPTIONS, isVehicleAvatar } from "@/lib/utils/avatars";
 import { Participant } from "@/types/database";
 
 interface PersonalProgressProps {
@@ -42,7 +42,15 @@ export function PersonalProgress({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="text-4xl animate-in zoom-in duration-300">
-                {participant.avatar}
+                <span
+                  className={
+                    isVehicleAvatar(participant.avatar)
+                      ? "inline-block -scale-x-100"
+                      : ""
+                  }
+                >
+                  {participant.avatar}
+                </span>
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -122,7 +130,13 @@ export function PersonalProgress({
                       isUpdatingAvatar ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
-                    {opt}
+                    <span
+                      className={
+                        isVehicleAvatar(opt) ? "inline-block -scale-x-100" : ""
+                      }
+                    >
+                      {opt}
+                    </span>
                   </button>
                 ))}
               </div>

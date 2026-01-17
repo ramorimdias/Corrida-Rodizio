@@ -8,8 +8,9 @@ interface JoinRaceFormProps {
   setPlayerName: (val: string) => void;
   roomCode: string;
   setRoomCode: (val: string) => void;
-  loginCode?: string | null;
   loading: boolean;
+  isSpectator: boolean;
+  setIsSpectator: (val: boolean) => void;
   onJoin: () => void;
   onBack: () => void;
 }
@@ -19,29 +20,60 @@ export function JoinRaceForm({
   setPlayerName,
   roomCode,
   setRoomCode,
-  loginCode,
   loading,
+  isSpectator,
+  setIsSpectator,
   onJoin,
   onBack,
 }: JoinRaceFormProps) {
-  const hasName = !!playerName.trim();
+  const hasName = isSpectator || !!playerName.trim();
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-left-4">
-      <div className="space-y-3">
-        <Label
-          htmlFor="playerName"
-          className="text-xs uppercase font-bold text-muted-foreground px-1"
+      <button
+        type="button"
+        onClick={() => setIsSpectator(!isSpectator)}
+        className={`flex items-center justify-between w-full p-4 rounded-xl border transition-all ${
+          isSpectator
+            ? "bg-primary/5 border-primary/20 shadow-inner"
+            : "bg-background border-muted"
+        }`}
+      >
+        <div className="text-left">
+          <p className="text-sm font-bold">Entrar como espectador</p>
+          <p className="text-[10px] text-muted-foreground uppercase">
+            Sem nome, apenas visualizacao
+          </p>
+        </div>
+        <div
+          className={`w-10 h-6 rounded-full relative ${
+            isSpectator ? "bg-primary" : "bg-muted"
+          }`}
         >
-          Seu Codinome
-        </Label>
-        <Input
-          id="playerName"
-          placeholder="Ex: Predador de Pizza"
-          value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
-          className="bg-background/50 h-14 text-lg font-medium"
-        />
-      </div>
+          <div
+            className={`absolute w-4 h-4 bg-white rounded-full top-1 transition-all ${
+              isSpectator ? "left-5" : "left-1"
+            }`}
+          />
+        </div>
+      </button>
+
+      {!isSpectator && (
+        <div className="space-y-3">
+          <Label
+            htmlFor="playerName"
+            className="text-xs uppercase font-bold text-muted-foreground px-1"
+          >
+            Seu Codinome
+          </Label>
+          <Input
+            id="playerName"
+            placeholder="Ex: Predador de Pizza"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            className="bg-background/50 h-14 text-lg font-medium"
+          />
+        </div>
+      )}
       <div className="space-y-3">
         <Label
           htmlFor="roomCode"
