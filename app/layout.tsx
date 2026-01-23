@@ -17,17 +17,27 @@ export const metadata: Metadata = {
       {
         url: "/icon-light-32x32.png",
         media: "(prefers-color-scheme: light)",
+        type: "image/png",
+        sizes: "32x32",
       },
       {
         url: "/icon-dark-32x32.png",
         media: "(prefers-color-scheme: dark)",
+        type: "image/png",
+        sizes: "32x32",
       },
       {
-        url: "/icon.svg",
-        type: "image/svg+xml",
+        url: "/icon-light.png",
+        media: "(prefers-color-scheme: light)",
+        type: "image/png",
+      },
+      {
+        url: "/icon-dark.png",
+        media: "(prefers-color-scheme: dark)",
+        type: "image/png",
       },
     ],
-    apple: "/apple-icon.png",
+    apple: "/icon-light.png",
   },
 }
 
