@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
-    apple: "/icon-light.png",
+    apple: "/apple-icon.png",
   },
 }
 
