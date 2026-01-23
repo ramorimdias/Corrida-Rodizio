@@ -126,10 +126,10 @@ export function AccountSection({
                           <span>
                             {group.items_eaten}{" "}
                             {group.food_type === "pizza"
-                              ? "pds"
+                              ? "pts"
                               : group.food_type === "sushi"
-                              ? "pçs"
-                              : "bgrs"}
+                              ? "pts"
+                              : "pts"}
                           </span>
                           <span>•</span>
                           <span className="font-bold text-primary/80">

@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { ChevronDown, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { AVATAR_OPTIONS, isVehicleAvatar } from "@/lib/utils/avatars";
+import {
+  AVATAR_OPTIONS,
+  getAvatarUrl,
+  isImageAvatar,
+  isVehicleAvatar,
+} from "@/lib/utils/avatars";
 import { Participant } from "@/types/database";
 
 interface PersonalProgressProps {
@@ -31,6 +36,29 @@ export function PersonalProgress({
   isAddCooldown,
 }: PersonalProgressProps) {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [avatarOptions, setAvatarOptions] = useState(AVATAR_OPTIONS);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadAvatars = async () => {
+      try {
+        const response = await fetch("/api/avatars");
+        if (!response.ok) return;
+        const data = await response.json();
+        const list = Array.isArray(data?.avatars) ? data.avatars : [];
+        if (list.length === 0) return;
+        const merged = Array.from(new Set([...list, ...AVATAR_OPTIONS]));
+        if (isMounted) setAvatarOptions(merged);
+      } catch {
+        return;
+      }
+    };
+
+    loadAvatars();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -42,15 +70,23 @@ export function PersonalProgress({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="text-4xl animate-in zoom-in duration-300">
-                <span
-                  className={
-                    isVehicleAvatar(participant.avatar)
-                      ? "inline-block -scale-x-100"
-                      : ""
-                  }
-                >
-                  {participant.avatar}
-                </span>
+                {isImageAvatar(participant.avatar) ? (
+                  <img
+                    src={getAvatarUrl(participant.avatar)}
+                    alt=""
+                    className="h-12 w-12 object-contain"
+                  />
+                ) : (
+                  <span
+                    className={
+                      isVehicleAvatar(participant.avatar)
+                        ? "inline-block -scale-x-100"
+                        : ""
+                    }
+                  >
+                    {participant.avatar}
+                  </span>
+                )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -114,7 +150,7 @@ export function PersonalProgress({
             </Button>
             {showAvatarPicker && (
               <div className="flex flex-wrap gap-2">
-                {AVATAR_OPTIONS.map((opt) => (
+                {avatarOptions.map((opt) => (
                   <button
                     key={opt}
                     disabled={isUpdatingAvatar}
@@ -130,13 +166,23 @@ export function PersonalProgress({
                       isUpdatingAvatar ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
-                    <span
-                      className={
-                        isVehicleAvatar(opt) ? "inline-block -scale-x-100" : ""
-                      }
-                    >
-                      {opt}
-                    </span>
+                    {isImageAvatar(opt) ? (
+                      <img
+                        src={getAvatarUrl(opt)}
+                        alt=""
+                        className="h-7 w-7 object-contain"
+                      />
+                    ) : (
+                      <span
+                        className={
+                          isVehicleAvatar(opt)
+                            ? "inline-block -scale-x-100"
+                            : ""
+                        }
+                      >
+                        {opt}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>

@@ -20,6 +20,7 @@ import type { Race, Participant } from "@/types/database";
 import { TeamSelection } from "@/components/room/team-selection";
 
 export default function RoomPage() {
+  const LOGIN_STORAGE_KEY = "rodizio-race-login";
   const addCooldownMs = 10_000;
   const cooldownMessages = [
     "Calma ai amigao.",
@@ -91,7 +92,35 @@ export default function RoomPage() {
         .eq("race_id", raceData.id)
         .order("items_eaten", { ascending: false });
 
-      if (participantsData) setParticipants(participantsData);
+      if (participantsData) {
+        setParticipants(participantsData);
+        if (!isSpectator) {
+          const storageKey = getParticipantStorageKey(roomCode);
+          const storedId = localStorage.getItem(storageKey);
+          if (storedId) {
+            setCurrentParticipantId(storedId);
+          } else {
+            const loginCode = localStorage.getItem(LOGIN_STORAGE_KEY);
+            const normalizedLogin = loginCode?.trim().toUpperCase();
+            if (normalizedLogin) {
+              const match = participantsData.find((participant) => {
+                const loginMatch = participant.login_code
+                  ?.trim()
+                  .toUpperCase();
+                const nameMatch = participant.name?.trim().toUpperCase();
+                return (
+                  loginMatch === normalizedLogin ||
+                  nameMatch === normalizedLogin
+                );
+              });
+              if (match) {
+                setCurrentParticipantId(match.id);
+                localStorage.setItem(storageKey, match.id);
+              }
+            }
+          }
+        }
+      }
     } catch (error) {
       console.error(error);
     } finally {

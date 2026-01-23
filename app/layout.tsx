@@ -9,8 +9,12 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Rodízio Race - Competição de Comilança",
+  title: "Rodízio Race",
   description: "Compete com amigos em rodízios e veja quem come mais em tempo real",
+  applicationName: "Rodízio Race",
+  appleWebApp: {
+    title: "Rodízio Race",
+  },
   generator: "v0.app",
   icons: {
     icon: [

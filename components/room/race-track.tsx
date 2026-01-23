@@ -2,7 +2,7 @@
 
 import { Participant } from "@/types/database";
 import { Card } from "@/components/ui/card";
-import { isVehicleAvatar } from "@/lib/utils/avatars";
+import { getAvatarUrl, isImageAvatar, isVehicleAvatar } from "@/lib/utils/avatars";
 import { Trophy, Timer } from "lucide-react";
 
 // Mapeamento de cores para manter a consistencia com o restante do app
@@ -94,13 +94,27 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
                     </span>
                   </div>
                   <div className="relative shrink-0">
-                    <span
-                      className={`text-2xl md:text-3xl transition-transform ${
-                        participant.items_eaten > 0 ? "animate-bounce" : ""
-                      } ${isVehicleAvatar(participant.avatar) ? "-scale-x-100 inline-block" : ""}`}
-                    >
-                      {participant.avatar}
-                    </span>
+                    {isImageAvatar(participant.avatar) ? (
+                      <img
+                        src={getAvatarUrl(participant.avatar)}
+                        alt=""
+                        className={`h-7 w-7 md:h-9 md:w-9 object-contain transition-transform ${
+                          participant.items_eaten > 0 ? "animate-bounce" : ""
+                        }`}
+                      />
+                    ) : (
+                      <span
+                        className={`text-2xl md:text-3xl transition-transform ${
+                          participant.items_eaten > 0 ? "animate-bounce" : ""
+                        } ${
+                          isVehicleAvatar(participant.avatar)
+                            ? "-scale-x-100 inline-block"
+                            : ""
+                        }`}
+                      >
+                        {participant.avatar}
+                      </span>
+                    )}
                     {isLeader && (
                       <Trophy className="absolute -top-3 -right-1 h-3 w-3 text-yellow-500 fill-yellow-500" />
                     )}

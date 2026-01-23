@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Race, Participant } from "@/types/database";
-import { isVehicleAvatar } from "@/lib/utils/avatars";
+import { getAvatarUrl, isImageAvatar, isVehicleAvatar } from "@/lib/utils/avatars";
 
 // Constantes movidas para o componente para facilitar a organização
 const MOTIVATIONAL_PHRASES = [
@@ -93,15 +93,23 @@ export function HallOfFame({
               >
                 <div className="flex items-center gap-4 z-10">
                   <div className="text-3xl">
-                    <span
-                      className={
-                        isVehicleAvatar(p.avatar)
-                          ? "inline-block -scale-x-100"
-                          : ""
-                      }
-                    >
-                      {p.avatar}
-                    </span>
+                    {isImageAvatar(p.avatar) ? (
+                      <img
+                        src={getAvatarUrl(p.avatar)}
+                        alt=""
+                        className="h-10 w-10 object-contain"
+                      />
+                    ) : (
+                      <span
+                        className={
+                          isVehicleAvatar(p.avatar)
+                            ? "inline-block -scale-x-100"
+                            : ""
+                        }
+                      >
+                        {p.avatar}
+                      </span>
+                    )}
                   </div>
                   <span
                     className={`text-2xl font-black ${

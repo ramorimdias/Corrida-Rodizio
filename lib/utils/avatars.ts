@@ -39,5 +39,12 @@ const VEHICLE_AVATAR_SET = new Set([
   "🚲",
 ]);
 
-export const isVehicleAvatar = (avatar: string) =>
-  VEHICLE_AVATAR_SET.has(avatar);
+const IMAGE_AVATAR_PATTERN = /\.(png|jpe?g|webp|gif)$/i;
+
+export const isVehicleAvatar = (avatar?: string | null) =>
+  !!avatar && VEHICLE_AVATAR_SET.has(avatar);
+
+export const isImageAvatar = (avatar?: string | null) =>
+  !!avatar && IMAGE_AVATAR_PATTERN.test(avatar);
+
+export const getAvatarUrl = (avatar: string) => `/avatars/${avatar}`;
