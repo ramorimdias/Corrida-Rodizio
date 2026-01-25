@@ -298,6 +298,9 @@ export default function AdminPage() {
                   type="password"
                   value={loginPassword}
                   onChange={(event) => setLoginPassword(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") handleLogin();
+                  }}
                   placeholder="Enter admin password"
                 />
               </div>

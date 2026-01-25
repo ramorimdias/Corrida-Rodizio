@@ -479,6 +479,9 @@ export function AccountSection({
                   placeholder="Sua senha"
                   value={accountPassword}
                   onChange={(e) => setAccountPassword(e.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") onLogin();
+                  }}
                   className="h-12"
                 />
               </div>
