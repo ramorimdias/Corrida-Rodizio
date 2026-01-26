@@ -155,7 +155,7 @@ export default function RoomPage() {
     const fallbackY = Math.round(window.innerHeight / 2);
     setCooldownToast({
       text: message,
-      x: event?.clientX ?? fallbackX,
+      x: (event?.clientX ?? fallbackX) - 28,
       y: event?.clientY ?? fallbackY,
     });
     if (cooldownToastTimeoutRef.current) {

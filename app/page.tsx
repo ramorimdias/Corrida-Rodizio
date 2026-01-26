@@ -620,7 +620,7 @@ export default function Home() {
           />
 
           <Card className="border-none shadow-2xl shadow-black/5 bg-card/80 backdrop-blur-md">
-            <CardContent className="pt-8 space-y-8">
+            <CardContent className="pt-0 space-y-8">
               {!flow && (
                 <AccountSection
                   loginCode={loginCode}
