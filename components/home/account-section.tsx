@@ -252,7 +252,7 @@ export function AccountSection({
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-bold">{group.name}</p>
                           {group.is_active ? (
-                            <span className="text-[8px] bg-orange-200/60 text-orange-700 px-1.5 py-0.5 rounded uppercase font-black">
+                            <span className="text-[8px] bg-orange-200/60 text-orange-700 dark:bg-purple-500/30 dark:text-purple-200 px-1.5 py-0.5 rounded uppercase font-black">
                               Em andamento
                             </span>
                           ) : (
