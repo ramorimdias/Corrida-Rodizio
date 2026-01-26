@@ -8,7 +8,7 @@ interface HomeHeaderProps {
 }
 
 export function HomeHeader({ isCompact, accountPill }: HomeHeaderProps) {
-  const logoSize = isCompact ? "h-32 md:h-36" : "h-52 md:h-64";
+  const logoSize = isCompact ? "h-28 md:h-32" : "h-44 md:h-56";
 
   return (
     <div className="text-center transition-all duration-300">
