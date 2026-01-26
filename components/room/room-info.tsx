@@ -50,7 +50,7 @@ export function RoomInfo({
             size="icon"
             variant="ghost"
             onClick={onCopyCode}
-            className="h-9 w-9 rounded-xl border border-muted/50 bg-background/80"
+            className="h-9 w-9 rounded-xl border border-muted/50 bg-background/80 hover:cursor-pointer"
           >
             {copied ? (
               <Check className="h-4 w-4 text-green-500" />

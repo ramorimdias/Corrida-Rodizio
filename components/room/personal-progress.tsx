@@ -20,7 +20,7 @@ interface PersonalProgressProps {
   onUpdateCount: (
     id: string,
     change: number,
-    event?: MouseEvent<HTMLButtonElement>
+    event?: MouseEvent<HTMLButtonElement>,
   ) => void;
   onUpdateAvatar: (avatar: string) => void;
   isUpdatingAvatar: boolean;
@@ -110,35 +110,35 @@ export function PersonalProgress({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 cursor-pointer"
-                onClick={(event) =>
-                  onUpdateCount(participant.id, -1, event)
-                }
+                className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive active:scale-75 transition-all duration-200 cursor-pointer"
+                onClick={(event) => onUpdateCount(participant.id, -1, event)}
                 disabled={participant.items_eaten === 0}
               >
                 <Minus className="h-4 w-4" />
               </Button>
-              <div className="w-10 text-center text-xl font-black">
+              <div
+                key={participant.items_eaten}
+                className="w-10 text-center text-2xl font-black text-primary drop-shadow-sm animate-in zoom-in-50 fade-in slide-in-from-bottom-1 duration-200"
+              >
                 {participant.items_eaten}
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                className={`h-8 w-8 cursor-pointer ${
+                className={`h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary active:scale-75 transition-all duration-200 cursor-pointer ${
                   isAddCooldown ? "opacity-50 grayscale" : ""
                 }`}
-                onClick={(event) =>
-                  onUpdateCount(participant.id, 1, event)
-                }
+                onClick={(event) => onUpdateCount(participant.id, 1, event)}
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          <div className="pt-4 border-t border-muted/40 space-y-3">
+
+          <div className="pt-4 border-t border-muted/40 space-y-3 ">
             <Button
               variant="outline"
-              className="w-full justify-between rounded-xl text-xs font-black uppercase tracking-[0.2em]"
+              className="w-full justify-between rounded-xl text-xs font-black uppercase tracking-[0.2em] hover:cursor-pointer"
               onClick={() => setShowAvatarPicker((prev) => !prev)}
               disabled={isUpdatingAvatar}
             >

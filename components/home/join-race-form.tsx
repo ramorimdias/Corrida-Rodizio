@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Hash, ArrowRight } from "lucide-react";
+import { Hash, ArrowRight, Loader2 } from "lucide-react";
 
 interface JoinRaceFormProps {
   playerName: string;
@@ -99,8 +99,16 @@ export function JoinRaceForm({
           onClick={onJoin}
           disabled={!hasName || !roomCode.trim() || loading}
         >
-          {loading ? "Localizando..." : "Entrar na Arena"}{" "}
-          <ArrowRight className="ml-2 h-5 w-5" />
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Localizando...
+            </>
+          ) : (
+            <>
+              Entrar na Arena <ArrowRight className="ml-2 h-5 w-5" />
+            </>
+          )}
         </Button>
         <Button
           variant="ghost"

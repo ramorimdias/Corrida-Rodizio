@@ -21,102 +21,101 @@ import { TeamSelection } from "@/components/room/team-selection";
 
 export default function RoomPage() {
   const LOGIN_STORAGE_KEY = "rodizio-race-login";
-  const addCooldownMs = 10_000;
+  const addCooldownMs = 2_000;
   const cooldownMessages = [
-  "Respira campeão, isso não é maratona.",
-  "Já pensou em mastigar?",
-  "Calma que o garçom não vai fugir.",
-  "Isso é rodízio, não último jantar.",
-  "Menos garfo, mais dignidade.",
-  "Vai devagar antes que dê ruim.",
-  "O estômago pediu arrego.",
-  "Você não ganha ponto por velocidade.",
-  "O prato ainda nem esfriou.",
-  "Mastiga ou só engole?",
-  "Vai com calma que o banheiro cobra depois.",
-  "Isso não é desafio do YouTube.",
-  "A comida não vai acabar.",
-  "Segura a fome ancestral.",
-  "O rodízio confia em você.",
-  "Daqui a pouco o corpo desliga.",
-  "O fígado está observando.",
-  "Você quer comer ou desaparecer?",
-  "Dá um tempo pro estômago entender.",
-  "Isso não é prova olímpica.",
-  "Vai virar estatística.",
-  "O garçom já está preocupado.",
-  "A cadeira já está rangendo.",
-  "Comendo assim nem sente o gosto.",
-  "Pausa estratégica, guerreiro.",
-  "A digestão também precisa viver.",
-  "Já bateu o recorde do exagero.",
-  "Calma antes que o arroz volte.",
-  "A sobremesa ainda existe.",
-  "Isso é jantar, não vingança.",
-  "O estômago não é buraco negro.",
-  "Vai devagar ou vai chorar depois.",
-  "Seu corpo pediu intervalo.",
-  "Mastigar é opcional agora?",
-  "Já estamos julgando em silêncio.",
-  "Isso não é speedrun.",
-  "O prato está pedindo socorro.",
-  "Menos voracidade, mais classe.",
-  "O rodízio não vai te abandonar.",
-  "O banheiro está lotado.",
-  "Come igual gente, não igual lenda urbana.",
-  "Você já venceu, relaxa.",
-  "A comida não te deve nada.",
-  "Vai com calma antes do arrependimento.",
-  "Isso não é teste de resistência.",
-  "O estômago está digitando um email.",
-  "Já estamos no limite humano.",
-  "A próxima mordida pode ser a última.",
-  "Dá um tempo pra gravidade agir.",
-  "Seu metabolismo não assinou isso.",
-  "Você não precisa provar nada.",
-  "O corpo já entrou em modo alerta.",
-  "Isso não é competição de engolir.",
-  "O prato não vai fugir.",
-  "Vai virar história triste.",
-  "Já passou do ponto gourmet.",
-  "Seu estômago pediu trégua.",
-  "Isso aí já é ganância.",
-  "Come menos, vive mais.",
-  "O rodízio agradece a pausa.",
-  "Seu corpo está negociando limites.",
-  "Isso é fome ou trauma?",
-  "Vai devagar que dói menos.",
-  "A comida merece respeito.",
-  "Já estamos preocupados com você.",
-  "Isso não acaba bem.",
-  "O estômago já fechou pra balanço.",
-  "Respira entre uma garfada e outra.",
-  "Isso não é prova eliminatória.",
-  "O rodízio não é contra você.",
-  "Seu corpo não é triturador.",
-  "Já entrou no modo exagero.",
-  "Vai com calma que ainda tem tempo.",
-  "A próxima garfada é opcional.",
-  "Isso já virou abuso gastronômico.",
-  "O estômago está cansado.",
-  "Você não é uma sucuri.",
-  "Come devagar pra não sofrer.",
-  "O rodízio não vale internação.",
-  "Já deu pra impressionar.",
-  "Seu corpo não pediu isso.",
-  "Isso é jantar, não desafio mortal.",
-  "A digestão não é instantânea.",
-  "Vai virar meme interno.",
-  "O prato está te julgando.",
-  "Isso não é fim do mundo.",
-  "Seu estômago está em pânico.",
-  "Dá um tempo antes do colapso.",
-  "Menos pressa, mais sobrevivência.",
-  "Isso já é excesso.",
-  "O rodízio continua amanhã.",
-  "Vai com calma, herói do garfo."
-];
-
+    "Respira campeão, isso não é maratona.",
+    "Já pensou em mastigar?",
+    "Calma que o garçom não vai fugir.",
+    "Isso é rodízio, não último jantar.",
+    "Menos garfo, mais dignidade.",
+    "Vai devagar antes que dê ruim.",
+    "O estômago pediu arrego.",
+    "Você não ganha ponto por velocidade.",
+    "O prato ainda nem esfriou.",
+    "Mastiga ou só engole?",
+    "Vai com calma que o banheiro cobra depois.",
+    "Isso não é desafio do YouTube.",
+    "A comida não vai acabar.",
+    "Segura a fome ancestral.",
+    "O rodízio confia em você.",
+    "Daqui a pouco o corpo desliga.",
+    "O fígado está observando.",
+    "Você quer comer ou desaparecer?",
+    "Dá um tempo pro estômago entender.",
+    "Isso não é prova olímpica.",
+    "Vai virar estatística.",
+    "O garçom já está preocupado.",
+    "A cadeira já está rangendo.",
+    "Comendo assim nem sente o gosto.",
+    "Pausa estratégica, guerreiro.",
+    "A digestão também precisa viver.",
+    "Já bateu o recorde do exagero.",
+    "Calma antes que o arroz volte.",
+    "A sobremesa ainda existe.",
+    "Isso é jantar, não vingança.",
+    "O estômago não é buraco negro.",
+    "Vai devagar ou vai chorar depois.",
+    "Seu corpo pediu intervalo.",
+    "Mastigar é opcional agora?",
+    "Já estamos julgando em silêncio.",
+    "Isso não é speedrun.",
+    "O prato está pedindo socorro.",
+    "Menos voracidade, mais classe.",
+    "O rodízio não vai te abandonar.",
+    "O banheiro está lotado.",
+    "Come igual gente, não igual lenda urbana.",
+    "Você já venceu, relaxa.",
+    "A comida não te deve nada.",
+    "Vai com calma antes do arrependimento.",
+    "Isso não é teste de resistência.",
+    "O estômago está digitando um email.",
+    "Já estamos no limite humano.",
+    "A próxima mordida pode ser a última.",
+    "Dá um tempo pra gravidade agir.",
+    "Seu metabolismo não assinou isso.",
+    "Você não precisa provar nada.",
+    "O corpo já entrou em modo alerta.",
+    "Isso não é competição de engolir.",
+    "O prato não vai fugir.",
+    "Vai virar história triste.",
+    "Já passou do ponto gourmet.",
+    "Seu estômago pediu trégua.",
+    "Isso aí já é ganância.",
+    "Come menos, vive mais.",
+    "O rodízio agradece a pausa.",
+    "Seu corpo está negociando limites.",
+    "Isso é fome ou trauma?",
+    "Vai devagar que dói menos.",
+    "A comida merece respeito.",
+    "Já estamos preocupados com você.",
+    "Isso não acaba bem.",
+    "O estômago já fechou pra balanço.",
+    "Respira entre uma garfada e outra.",
+    "Isso não é prova eliminatória.",
+    "O rodízio não é contra você.",
+    "Seu corpo não é triturador.",
+    "Já entrou no modo exagero.",
+    "Vai com calma que ainda tem tempo.",
+    "A próxima garfada é opcional.",
+    "Isso já virou abuso gastronômico.",
+    "O estômago está cansado.",
+    "Você não é uma sucuri.",
+    "Come devagar pra não sofrer.",
+    "O rodízio não vale internação.",
+    "Já deu pra impressionar.",
+    "Seu corpo não pediu isso.",
+    "Isso é jantar, não desafio mortal.",
+    "A digestão não é instantânea.",
+    "Vai virar meme interno.",
+    "O prato está te julgando.",
+    "Isso não é fim do mundo.",
+    "Seu estômago está em pânico.",
+    "Dá um tempo antes do colapso.",
+    "Menos pressa, mais sobrevivência.",
+    "Isso já é excesso.",
+    "O rodízio continua amanhã.",
+    "Vai com calma, herói do garfo.",
+  ];
 
   const params = useParams();
   const router = useRouter();
@@ -145,10 +144,10 @@ export default function RoomPage() {
   const [isAddCooldownActive, setIsAddCooldownActive] = useState(false);
   const lastAddAtRef = useRef<number | null>(null);
   const cooldownToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
+    null,
   );
   const addCooldownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
+    null,
   );
 
   const getItemLabel = (count: number) => {
@@ -195,9 +194,7 @@ export default function RoomPage() {
             const normalizedLogin = loginCode?.trim().toUpperCase();
             if (normalizedLogin) {
               const match = participantsData.find((participant) => {
-                const loginMatch = participant.login_code
-                  ?.trim()
-                  .toUpperCase();
+                const loginMatch = participant.login_code?.trim().toUpperCase();
                 const nameMatch = participant.name?.trim().toUpperCase();
                 return (
                   loginMatch === normalizedLogin ||
@@ -246,13 +243,13 @@ export default function RoomPage() {
     }
     cooldownToastTimeoutRef.current = setTimeout(() => {
       setCooldownToast(null);
-    }, 2500);
+    }, 1000);
   };
 
   const handleUpdateCount = async (
     participantId: string,
     change: number,
-    event?: MouseEvent<HTMLButtonElement>
+    event?: MouseEvent<HTMLButtonElement>,
   ) => {
     if (change > 0) {
       const now = Date.now();
@@ -351,12 +348,12 @@ export default function RoomPage() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "participants" },
-        () => loadRoomData()
+        () => loadRoomData(),
       )
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "races" },
-        () => loadRoomData()
+        () => loadRoomData(),
       )
       .subscribe();
 
@@ -372,7 +369,7 @@ export default function RoomPage() {
   }, [roomCode, isSpectator]);
 
   const currentParticipant = participants.find(
-    (p) => p.id === currentParticipantId
+    (p) => p.id === currentParticipantId,
   );
 
   useEffect(() => {
@@ -408,7 +405,7 @@ export default function RoomPage() {
           setExclusiveAvatars(
             Array.isArray(exclusiveData)
               ? exclusiveData.map((row) => row.avatar)
-              : []
+              : [],
           );
         }
       } catch (error) {

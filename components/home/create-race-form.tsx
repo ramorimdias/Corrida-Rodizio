@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users2, ArrowRight } from "lucide-react";
+import { Users2, ArrowRight, Loader2 } from "lucide-react";
 import { FoodType } from "@/types/database";
 
 interface CreateRaceFormProps {
@@ -112,8 +112,16 @@ export function CreateRaceForm({
           onClick={onCreate}
           disabled={!playerName.trim() || !selectedFood || loading}
         >
-          {loading ? "Preparando Mesa..." : "Criar Competicao"}{" "}
-          <ArrowRight className="ml-2 h-5 w-5" />
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Preparando Mesa...
+            </>
+          ) : (
+            <>
+              Criar Competicao <ArrowRight className="ml-2 h-5 w-5" />
+            </>
+          )}
         </Button>
         <Button
           variant="ghost"
