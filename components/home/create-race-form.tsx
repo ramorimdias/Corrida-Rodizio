@@ -113,13 +113,13 @@ export function CreateRaceForm({
       </div>
 
       {/* CHECKBOX DE TERMOS E PRIVACIDADE */}
-      <div className="flex items-start gap-3 px-1">
+      <div className="flex items-center gap-3 px-1">
         <input
           type="checkbox"
           id="terms-create"
           checked={agreed}
           onChange={(e) => setAgreed(e.target.checked)}
-          className="mt-1 h-4 w-4 rounded border-primary text-primary focus:ring-primary accent-primary cursor-pointer"
+          className=" h-4 w-4 rounded border-primary text-primary focus:ring-primary accent-primary cursor-pointer"
         />
         <label
           htmlFor="terms-create"

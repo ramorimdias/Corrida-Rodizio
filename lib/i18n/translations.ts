@@ -1,6 +1,6 @@
 // lib/i18n/translations.ts
 
-export type Language = "pt" | "en";
+export type Language = "pt" | "en" | "es";
 
 export const translations = {
   pt: {
@@ -199,6 +199,147 @@ export const translations = {
         "Seu limite foi atingido antes do garçom!",
         "O campeão come mais, mas você comeu bem!",
         "Derrota honrosa: saiu andando, não rolando!",
+      ],
+    },
+    terms_page: {
+      header_label: "📄 Termos de Uso",
+      title: "Rodízio Race",
+      last_update: "Última atualização: 27 de janeiro de 2026",
+      intro:
+        "Ao acessar o site Rodízio Race, você concorda com os seguintes Termos de Uso. Caso não concorde com algum deles, recomendamos que não utilize o site.",
+      sections: [
+        {
+          title: "Uso do site",
+          content: [
+            "O conteúdo disponibilizado no Rodízio Race é fornecido apenas para fins informativos e recreativos. O uso do site é de responsabilidade exclusiva do usuário.",
+          ],
+        },
+        {
+          title: "Propriedade intelectual",
+          content: [
+            "Todo o conteúdo presente neste site, incluindo textos, logos, gráficos e código, é de propriedade do Rodízio Race ou de seus respectivos autores, salvo indicação em contrário.",
+            "É proibida a reprodução, distribuição ou modificação do conteúdo sem autorização prévia.",
+          ],
+        },
+        {
+          title: "Responsabilidades",
+          content: [
+            "Não garantimos que o site estará sempre disponível, livre de erros ou interrupções.",
+            "Não nos responsabilizamos por eventuais danos diretos ou indiretos decorrentes do uso ou da impossibilidade de uso do site.",
+          ],
+        },
+        {
+          title: "Conteúdo de terceiros",
+          content: [
+            "O site pode exibir conteúdos ou anúncios de terceiros. Não nos responsabilizamos pela veracidade, qualidade ou legalidade desses conteúdos.",
+          ],
+        },
+        {
+          title: "Modificações do serviço",
+          content: [
+            "Reservamo-nos o direito de modificar, suspender ou encerrar o site ou qualquer funcionalidade a qualquer momento, sem aviso prévio.",
+          ],
+        },
+        {
+          title: "Limitação de responsabilidade",
+          content: [
+            "Em nenhuma circunstância o Rodízio Race será responsável por perdas ou danos decorrentes do uso do site.",
+          ],
+        },
+        {
+          title: "Lei aplicável",
+          content: [
+            "Estes Termos são regidos pelas leis aplicáveis da União Europeia, respeitando o Regulamento Geral de Proteção de Dados (GDPR), quando aplicável.",
+          ],
+        },
+        {
+          title: "Contato",
+          content: [
+            "Para dúvidas relacionadas a estes Termos de Uso, entre em contato:",
+          ],
+          footer: "contato@mechama.eu",
+        },
+      ],
+    },
+    privacy_page: {
+      header_label: "📄 Política de Privacidade",
+      title: "Rodízio Race",
+      last_update: "Última atualização: 27 de janeiro de 2026",
+      intro:
+        "O site Rodízio Race, acessível em https://rodiziorace.mechama.eu, respeita a sua privacidade e está comprometido em proteger os dados pessoais dos seus usuários. Esta Política de Privacidade descreve como coletamos, usamos e protegemos suas informações.",
+      sections: [
+        {
+          title: "Informações que coletamos",
+          content: [
+            "Podemos coletar informações pessoais de forma automática ou fornecidas voluntariamente pelo usuário, incluindo:",
+          ],
+          items: [
+            "Endereço IP",
+            "Tipo de navegador e dispositivo",
+            "Páginas visitadas e tempo de navegação",
+            "Cookies e tecnologias similares",
+          ],
+          footer:
+            "Não solicitamos informações sensíveis como dados bancários, documentos oficiais ou informações de saúde.",
+        },
+        {
+          title: "Uso das informações",
+          content: ["As informações coletadas são utilizadas para:"],
+          items: [
+            "Melhorar a experiência do usuário",
+            "Entender como o site é utilizado",
+            "Monitorar desempenho e estabilidade",
+            "Exibir anúncios relevantes",
+          ],
+        },
+        {
+          title: "Cookies e tecnologias de rastreamento",
+          content: [
+            "Utilizamos cookies para armazenar preferências do usuário e otimizar a navegação.",
+            "Cookies podem ser utilizados por parceiros terceiros, incluindo o Google, para exibir anúncios personalizados com base nas visitas anteriores do usuário a este e a outros sites.",
+            "Você pode desativar os cookies diretamente nas configurações do seu navegador.",
+          ],
+        },
+        {
+          title: "Google AdSense",
+          content: [
+            "Este site utiliza o Google AdSense, um serviço de publicidade fornecido pela Google.",
+            "O Google pode usar cookies, incluindo o cookie DART, para exibir anúncios com base nos interesses do usuário e em suas visitas anteriores.",
+            "Os usuários podem desativar a publicidade personalizada acessando:",
+          ],
+          link: "https://adssettings.google.com",
+        },
+        {
+          title: "Compartilhamento de informações",
+          content: [
+            "Não vendemos, trocamos ou transferimos informações pessoais para terceiros, exceto quando exigido por lei ou para o funcionamento técnico do site (ex.: serviços de análise ou publicidade).",
+          ],
+        },
+        {
+          title: "Links para sites externos",
+          content: [
+            "O site pode conter links para sites externos. Não nos responsabilizamos pelas políticas de privacidade desses sites.",
+          ],
+        },
+        {
+          title: "Consentimento",
+          content: [
+            "Ao utilizar nosso site, você concorda com esta Política de Privacidade.",
+          ],
+        },
+        {
+          title: "Alterações nesta política",
+          content: [
+            "Esta política pode ser atualizada periodicamente. Recomendamos que você a revise regularmente.",
+          ],
+        },
+        {
+          title: "Contato",
+          content: [
+            "Em caso de dúvidas sobre esta Política de Privacidade, entre em contato pelo e-mail:",
+          ],
+          footer: "contato@mechama.eu",
+        },
       ],
     },
     footer: {
@@ -400,6 +541,145 @@ export const translations = {
         "Your limit was reached before the waiter's!",
         "The champion eats more, but you ate well!",
         "Honorable defeat: left walking, not rolling!",
+      ],
+    },
+    terms_page: {
+      header_label: "📄 Terms of Use",
+      title: "Rodízio Race",
+      last_update: "Last updated: January 27, 2026",
+      intro:
+        "By accessing the Rodízio Race website, you agree to the following Terms of Use. If you do not agree with any of them, we recommend that you do not use the site.",
+      sections: [
+        {
+          title: "Site Usage",
+          content: [
+            "The content provided on Rodízio Race is for informational and recreational purposes only. Use of the site is the sole responsibility of the user.",
+          ],
+        },
+        {
+          title: "Intellectual Property",
+          content: [
+            "All content on this site, including text, logos, graphics, and code, is the property of Rodízio Race or its respective authors, unless otherwise indicated.",
+            "Reproduction, distribution, or modification of the content without prior authorization is prohibited.",
+          ],
+        },
+        {
+          title: "Responsibilities",
+          content: [
+            "We do not guarantee that the site will always be available, free of errors or interruptions.",
+            "We are not responsible for any direct or indirect damages resulting from the use or inability to use the site.",
+          ],
+        },
+        {
+          title: "Third-Party Content",
+          content: [
+            "The site may display third-party content or ads. We are not responsible for the accuracy, quality, or legality of such content.",
+          ],
+        },
+        {
+          title: "Service Modifications",
+          content: [
+            "We reserve the right to modify, suspend, or terminate the site or any functionality at any time without prior notice.",
+          ],
+        },
+        {
+          title: "Limitation of Liability",
+          content: [
+            "Under no circumstances shall Rodízio Race be liable for any loss or damage arising from the use of the site.",
+          ],
+        },
+        {
+          title: "Applicable Law",
+          content: [
+            "These Terms are governed by the applicable laws of the European Union, respecting the General Data Protection Regulation (GDPR), where applicable.",
+          ],
+        },
+        {
+          title: "Contact",
+          content: [
+            "For questions regarding these Terms of Use, please contact:",
+          ],
+          footer: "contato@mechama.eu",
+        },
+      ],
+    },
+    privacy_page: {
+      header_label: "📄 Privacy Policy",
+      title: "Rodízio Race",
+      last_update: "Last updated: January 27, 2026",
+      intro:
+        "The Rodízio Race website, accessible at https://rodiziorace.mechama.eu, respects your privacy and is committed to protecting its users' personal data. This Privacy Policy describes how we collect, use, and protect your information.",
+      sections: [
+        {
+          title: "Information We Collect",
+          content: [
+            "We may collect personal information automatically or voluntarily provided by the user, including:",
+          ],
+          items: [
+            "IP Address",
+            "Browser type and device",
+            "Pages visited and browsing time",
+            "Cookies and similar technologies",
+          ],
+          footer:
+            "We do not request sensitive information such as bank details, official documents, or health information.",
+        },
+        {
+          title: "Use of Information",
+          content: ["The information collected is used to:"],
+          items: [
+            "Improve user experience",
+            "Understand how the site is used",
+            "Monitor performance and stability",
+            "Display relevant ads",
+          ],
+        },
+        {
+          title: "Cookies and Tracking Technologies",
+          content: [
+            "We use cookies to store user preferences and optimize browsing.",
+            "Cookies may be used by third-party partners, including Google, to serve personalized ads based on the user's previous visits to this and other sites.",
+            "You can disable cookies directly in your browser settings.",
+          ],
+        },
+        {
+          title: "Google AdSense",
+          content: [
+            "This site uses Google AdSense, an advertising service provided by Google.",
+            "Google may use cookies, including the DART cookie, to serve ads based on user interests and previous visits.",
+            "Users can opt out of personalized advertising by visiting:",
+          ],
+          link: "https://adssettings.google.com",
+        },
+        {
+          title: "Information Sharing",
+          content: [
+            "We do not sell, trade, or transfer personal information to third parties, except when required by law or for the technical operation of the site (e.g., analytics or advertising services).",
+          ],
+        },
+        {
+          title: "Links to External Sites",
+          content: [
+            "The site may contain links to external sites. We are not responsible for the privacy policies of those sites.",
+          ],
+        },
+        {
+          title: "Consent",
+          content: ["By using our site, you agree to this Privacy Policy."],
+        },
+        {
+          title: "Changes to this Policy",
+          content: [
+            "This policy may be updated periodically. We recommend that you review it regularly.",
+          ],
+        },
+        {
+          title: "Contact",
+          content: [
+            "If you have questions about this Privacy Policy, please contact us by email:",
+          ],
+          footer: "contato@mechama.eu",
+        },
       ],
     },
     footer: {
@@ -606,6 +886,147 @@ export const translations = {
     },
     footer: {
       copyright: "© {{year}} Passa Raiva. Todos los derechos reservados.",
+    },
+    terms_page: {
+      header_label: "📄 Términos de Uso",
+      title: "Rodízio Race",
+      last_update: "Última actualización: 27 de enero de 2026",
+      intro:
+        "Al acceder al sitio web Rodízio Race, aceptas los siguientes Términos de Uso. Si no estás de acuerdo con alguno de ellos, te recomendamos que no utilices el sitio.",
+      sections: [
+        {
+          title: "Uso del sitio",
+          content: [
+            "El contenido disponible en Rodízio Race se proporciona solo con fines informativos y recreativos. El uso del sitio es responsabilidad exclusiva del usuario.",
+          ],
+        },
+        {
+          title: "Propiedad intelectual",
+          content: [
+            "Todo el contenido presente en este sitio, incluidos textos, logotipos, gráficos y código, es propiedad de Rodízio Race o de sus respectivos autores, a menos que se indique lo contrario.",
+            "Queda prohibida la reproducción, distribución o modificación del contenido sin autorización previa.",
+          ],
+        },
+        {
+          title: "Responsabilidades",
+          content: [
+            "No garantizamos que el sitio esté siempre disponible, libre de errores o interrupciones.",
+            "No nos hacemos responsables de los daños directos o indirectos derivados del uso o la imposibilidad de uso del sitio.",
+          ],
+        },
+        {
+          title: "Contenido de terceros",
+          content: [
+            "El sitio puede mostrar contenido o anuncios de terceros. No nos hacemos responsables de la veracidad, calidad o legalidad de dicho contenido.",
+          ],
+        },
+        {
+          title: "Modificaciones del servicio",
+          content: [
+            "Nos reservamos el derecho de modificar, suspender o cancelar el sitio o cualquier funcionalidad en cualquier momento, sin previo aviso.",
+          ],
+        },
+        {
+          title: "Limitación de responsabilidad",
+          content: [
+            "En ninguna circunstancia Rodízio Race será responsable por pérdidas o daños derivados del uso del sitio.",
+          ],
+        },
+        {
+          title: "Ley aplicable",
+          content: [
+            "Estos Términos se rigen por las leyes aplicables de la Unión Europea, respetando el Reglamento General de Protección de Datos (GDPR), cuando corresponda.",
+          ],
+        },
+        {
+          title: "Contacto",
+          content: [
+            "Para dudas relacionadas con estos Términos de Uso, ponte en contacto:",
+          ],
+          footer: "contato@mechama.eu",
+        },
+      ],
+    },
+    privacy_page: {
+      header_label: "📄 Política de Privacidad",
+      title: "Rodízio Race",
+      last_update: "Última actualización: 27 de enero de 2026",
+      intro:
+        "El sitio Rodízio Race, accesible en https://rodiziorace.mechama.eu, respeta tu privacidad y se compromete a proteger los datos personales de sus usuarios. Esta Política de Privacidad describe cómo recopilamos, usamos y protegemos tu información.",
+      sections: [
+        {
+          title: "Información que recopilamos",
+          content: [
+            "Podemos recopilar información personal de forma automática o proporcionada voluntariamente por el usuario, incluyendo:",
+          ],
+          items: [
+            "Dirección IP",
+            "Tipo de navegador y dispositivo",
+            "Páginas visitadas y tiempo de navegación",
+            "Cookies y tecnologías similares",
+          ],
+          footer:
+            "No solicitamos información confidencial como datos bancarios, documentos oficiales o información de salud.",
+        },
+        {
+          title: "Uso de la información",
+          content: ["La información recopilada se utiliza para:"],
+          items: [
+            "Mejorar la experiencia del usuario",
+            "Entender cómo se utiliza el sitio",
+            "Supervisar el rendimiento y la estabilidad",
+            "Mostrar anuncios relevantes",
+          ],
+        },
+        {
+          title: "Cookies y tecnologías de seguimiento",
+          content: [
+            "Utilizamos cookies para almacenar las preferencias del usuario y optimizar la navegación.",
+            "Las cookies pueden ser utilizadas por socios externos, incluido Google, para mostrar anuncios personalizados basados en las visitas anteriores del usuario a este y otros sitios.",
+            "Puedes desactivar las cookies directamente en la configuración de tu navegador.",
+          ],
+        },
+        {
+          title: "Google AdSense",
+          content: [
+            "Este sitio utiliza Google AdSense, un servicio de publicidad proporcionado por Google.",
+            "Google puede utilizar cookies, incluida la cookie DART, para mostrar anuncios basados en los intereses del usuario y sus visitas anteriores.",
+            "Los usuarios pueden optar por no recibir publicidad personalizada visitando:",
+          ],
+          link: "https://adssettings.google.com",
+        },
+        {
+          title: "Intercambio de información",
+          content: [
+            "No vendemos, intercambiamos ni transferimos información personal a terceros, excepto cuando lo exija la ley o para el funcionamiento técnico del sitio (por ejemplo, servicios de análisis o publicidad).",
+          ],
+        },
+        {
+          title: "Enlaces a sitios externos",
+          content: [
+            "El sitio puede contener enlaces a sitios externos. No nos hacemos responsables de las políticas de privacidad de esos sitios.",
+          ],
+        },
+        {
+          title: "Consentimiento",
+          content: [
+            "Al utilizar nuestro sitio, aceptas esta Política de Privacidad.",
+          ],
+        },
+        {
+          title: "Cambios en esta política",
+          content: [
+            "Esta política puede actualizarse periódicamente. Recomendamos que la revises regularmente.",
+          ],
+        },
+        {
+          title: "Contacto",
+          content: [
+            "Si tienes dudas sobre esta Política de Privacidad, contáctanos por correo electrónico:",
+          ],
+          footer: "contato@mechama.eu",
+        },
+      ],
     },
   },
 };

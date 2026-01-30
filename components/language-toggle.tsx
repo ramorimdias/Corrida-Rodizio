@@ -3,29 +3,39 @@
 
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/language-context";
+import { Globe } from "lucide-react";
 
 export function LanguageToggle() {
   const { language, setLanguage } = useLanguage();
-  const languages = [
-    { code: "pt", label: "BR", title: "Mudar para Inglês ou Espanhol" },
-    { code: "en", label: "EN", title: "Change to Portuguese or Spanish" },
-    { code: "es", label: "ES", title: "Cambiar a Portugués o Inglés" },
-  ];
+
+  const cycleLanguage = () => {
+    if (language === "pt") {
+      setLanguage("en");
+    } else if (language === "en") {
+      setLanguage("es" as any);
+    } else {
+      setLanguage("pt");
+    }
+  };
+
+  const labels = {
+    pt: "BR",
+    en: "EN",
+    es: "ES",
+  };
 
   return (
-    <div className="flex gap-2">
-      {languages.map((lang) => (
-        <Button
-          key={lang.code}
-          variant={language === lang.code ? "default" : "ghost"}
-          size="icon"
-          onClick={() => setLanguage(lang.code as any)}
-          title={lang.title}
-          className={`w-9 h-9 rounded-xl border border-muted/50 bg-background/80 ${language === lang.code ? "font-bold" : ""}`}
-        >
-          <span className="text-xs">{lang.label}</span>
-        </Button>
-      ))}
-    </div>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={cycleLanguage}
+      title="Alterar idioma / Change language"
+      className="h-9 gap-2 rounded-xl border border-muted/50 bg-background/80 px-3 transition-all hover:bg-accent hover:text-accent-foreground"
+    >
+      <Globe className="h-4 w-4 text-muted-foreground" />
+      <span className="text-xs font-bold">
+        {labels[language as keyof typeof labels]}
+      </span>
+    </Button>
   );
 }
