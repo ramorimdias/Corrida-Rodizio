@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowLeft, Settings } from "lucide-react";
+import { Plus, ArrowLeft, Settings, Users } from "lucide-react";
 import confetti from "canvas-confetti";
 
 import { RoomHeader } from "@/components/room/room-header";
@@ -520,12 +520,29 @@ export default function RoomPage() {
           />
         )}
 
-        {participants.length > 0 && (
+        {participants.length === 1 ? (
+          <div className="flex flex-col items-center justify-center py-10 px-4 space-y-4 rounded-xl border-2 border-dashed border-muted/60 bg-muted/5 text-center animate-in fade-in zoom-in duration-500">
+            <div className="p-4 bg-muted/20 rounded-full">
+              <Users className="w-8 h-8 text-muted-foreground/70" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-semibold text-lg text-foreground">
+                {t.room.waiting_participants}
+              </h3>
+              <p className="text-xs text-muted-foreground max-w-[250px] mx-auto">
+                {t.home.join_race}:{" "}
+                <span className="font-mono font-bold text-primary">
+                  {roomCode}
+                </span>
+              </p>
+            </div>
+          </div>
+        ) : participants.length >= 2 ? (
           <RaceTrack
             participants={participants}
             isTeamMode={race.is_team_mode}
           />
-        )}
+        ) : null}
 
         <RankingSection
           race={race}
@@ -533,7 +550,6 @@ export default function RoomPage() {
           currentParticipantId={currentParticipantId}
           getItemLabel={getItemLabel}
         />
-
       </div>
 
       {currentParticipant && (
