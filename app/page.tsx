@@ -37,12 +37,12 @@ export default function Home() {
   const [hasEditedName, setHasEditedName] = useState(false);
   const [isSpectator, setIsSpectator] = useState(false);
   const [defaultAvatar, setDefaultAvatar] = useState<string | null>(
-    DEFAULT_AVATAR
+    DEFAULT_AVATAR,
   );
 
   // ESTADOS DE CONTA
   const [accountFlow, setAccountFlow] = useState<"login" | "create" | null>(
-    null
+    null,
   );
   const [accountCodeInput, setAccountCodeInput] = useState("");
   const [accountPassword, setAccountPassword] = useState("");
@@ -283,7 +283,7 @@ export default function Home() {
           is_active,
           created_at
         )
-      `
+      `,
         )
         .eq("login_code", codeToUse);
 
@@ -315,7 +315,7 @@ export default function Home() {
       // Converte o Mapa de volta para Array e ordena pela data de criação (mais recentes primeiro)
       const history = Array.from(historyMap.values()).sort(
         (a: any, b: any) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       );
 
       setMyGroups(history);
@@ -452,7 +452,7 @@ export default function Home() {
           avatar: defaultAvatar,
           is_vip: true,
           login_code: loginCode,
-        }
+        },
       );
       if (participant)
         localStorage.setItem(getParticipantStorageKey(code), participant.id);
@@ -502,7 +502,7 @@ export default function Home() {
         // Se encontrar, re-associa o usuário ao registro antigo (mantém o status VIP se houver)
         localStorage.setItem(
           getParticipantStorageKey(normalized),
-          existingParticipant.id
+          existingParticipant.id,
         );
         router.push(`/sala/${normalized}`);
         return;
@@ -524,7 +524,7 @@ export default function Home() {
       if (participant)
         localStorage.setItem(
           getParticipantStorageKey(normalized),
-          participant.id
+          participant.id,
         );
 
       router.push(`/sala/${normalized}`);
@@ -677,54 +677,54 @@ export default function Home() {
                   onMenuStateChange={setIsAccountMenuOpen}
                   router={router}
                 />
-      )}
-      {showPasswordSuccess && (
-        <>
-          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
-          <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-muted/60 bg-background/95 p-4 text-center shadow-xl backdrop-blur">
-            <p className="text-sm font-semibold text-foreground">
-              Senha trocada com sucesso
-            </p>
-            <Button
-              className="mt-3 w-full h-10 rounded-xl font-bold"
-              onClick={() => setShowPasswordSuccess(false)}
-            >
-              OK
-            </Button>
-          </div>
-        </>
-      )}
-      {showAddToHomeHelp && (
-        <>
-          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
-          <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-muted/60 bg-background/95 p-4 text-center shadow-xl backdrop-blur">
-            <p className="text-sm font-semibold text-foreground">
-              {t.common.add_to_home_title}
-            </p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              {t.common.add_to_home_steps}
-            </p>
-            <Button
-              className="mt-3 w-full h-10 rounded-xl font-bold"
-              onClick={() => setShowAddToHomeHelp(false)}
-            >
-              OK
-            </Button>
-          </div>
-        </>
-      )}
+              )}
+              {showPasswordSuccess && (
+                <>
+                  <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
+                  <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-muted/60 bg-background/95 p-4 text-center shadow-xl backdrop-blur">
+                    <p className="text-sm font-semibold text-foreground">
+                      Senha trocada com sucesso
+                    </p>
+                    <Button
+                      className="mt-3 w-full h-10 rounded-xl font-bold"
+                      onClick={() => setShowPasswordSuccess(false)}
+                    >
+                      OK
+                    </Button>
+                  </div>
+                </>
+              )}
+              {showAddToHomeHelp && (
+                <>
+                  <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
+                  <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-muted/60 bg-background/95 p-4 text-center shadow-xl backdrop-blur">
+                    <p className="text-sm font-semibold text-foreground">
+                      {t.common.add_to_home_title}
+                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t.common.add_to_home_steps}
+                    </p>
+                    <Button
+                      className="mt-3 w-full h-10 rounded-xl font-bold"
+                      onClick={() => setShowAddToHomeHelp(false)}
+                    >
+                      OK
+                    </Button>
+                  </div>
+                </>
+              )}
 
               {!isAccountMenuOpen &&
                 (!flow ? (
                   <StartActions onSetFlow={setFlow} />
                 ) : flow === "create" ? (
-                <CreateRaceForm
-                  playerName={playerName}
-                  setPlayerName={handlePlayerNameChange}
-                  isTeamMode={isTeamMode}
-                  setIsTeamMode={setIsTeamMode}
-                  selectedFood={selectedFood}
-                  setSelectedFood={setSelectedFood}
+                  <CreateRaceForm
+                    playerName={playerName}
+                    setPlayerName={handlePlayerNameChange}
+                    isTeamMode={isTeamMode}
+                    setIsTeamMode={setIsTeamMode}
+                    selectedFood={selectedFood}
+                    setSelectedFood={setSelectedFood}
                     foodTypes={foodTypes}
                     loading={loading}
                     onCreate={handleCreateRoom}
@@ -753,6 +753,14 @@ export default function Home() {
           </Card>
         </div>
       </div>
+      <footer className="mt-8 mb-4 text-center text-[10px] text-muted-foreground/60 uppercase font-medium tracking-widest">
+        <p>
+          {t.footer.copyright.replace(
+            "{{year}}",
+            new Date().getFullYear().toString(),
+          )}
+        </p>
+      </footer>
     </div>
   );
 }

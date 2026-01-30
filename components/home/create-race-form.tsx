@@ -1,3 +1,5 @@
+import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +33,8 @@ export function CreateRaceForm({
   onBack,
 }: CreateRaceFormProps) {
   const { t } = useLanguage();
+  // Estado para controlar o checkbox
+  const [agreed, setAgreed] = useState(false);
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
@@ -108,12 +112,45 @@ export function CreateRaceForm({
         </div>
       </div>
 
+      {/* CHECKBOX DE TERMOS E PRIVACIDADE */}
+      <div className="flex items-start gap-3 px-1">
+        <input
+          type="checkbox"
+          id="terms-create"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          className="mt-1 h-4 w-4 rounded border-primary text-primary focus:ring-primary accent-primary cursor-pointer"
+        />
+        <label
+          htmlFor="terms-create"
+          className="text-xs text-muted-foreground leading-tight cursor-pointer select-none"
+        >
+          {t.common.terms_pre_link}
+          <Link
+            href="/terms"
+            className="underline hover:text-primary"
+            target="_blank"
+          >
+            {t.common.terms_link}
+          </Link>
+          {t.common.privacy_connector}
+          <Link
+            href="/privacy"
+            className="underline hover:text-primary"
+            target="_blank"
+          >
+            {t.common.privacy_link}
+          </Link>
+          {t.common.terms_post_link}
+        </label>
+      </div>
+
       <div className="pt-2 space-y-4">
         <Button
           size="lg"
           className="w-full h-14 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 cursor-pointer"
           onClick={onCreate}
-          disabled={!playerName.trim() || !selectedFood || loading}
+          disabled={!playerName.trim() || !selectedFood || loading || !agreed}
         >
           {loading ? (
             <>
