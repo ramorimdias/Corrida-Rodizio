@@ -3,7 +3,7 @@ import { createHash, randomBytes } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const CODE_LENGTH = 6;
-const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789";
+const CODE_ALPHABET = "ABCDEFGHJKLMNPQRTUVWXY346789";
 
 const generateCode = () => {
   const bytes = randomBytes(CODE_LENGTH);
