@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { Participant } from "@/types/database";
 import { Card } from "@/components/ui/card";
 import { getAvatarUrl, isImageAvatar } from "@/lib/utils/avatars";
-import { Trophy, Timer } from "lucide-react";
+import { Trophy, Timer, Zap, ZapOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/language-context";
 
-// Mapeamento de cores para manter a consistencia com o restante do app
 const TEAM_COLORS: Record<string, string> = {
   AZUL: "border-blue-500/50 text-blue-400 bg-blue-500/10",
   VERMELHA: "border-red-500/50 text-red-400 bg-red-500/10",
@@ -15,55 +17,122 @@ const TEAM_COLORS: Record<string, string> = {
 
 interface RaceTrackProps {
   participants: Participant[];
-  isTeamMode: boolean; // Adicionado para ativar o visual de times
+  isTeamMode: boolean;
 }
 
 export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
-  const maxScore = Math.max(...participants.map((p) => p.items_eaten), 1);
+  const [enableAnimations, setEnableAnimations] = useState(true);
+  const { t } = useLanguage();
+
+  const scores = participants.map((p) => p.items_eaten);
+  const currentMax = scores.length > 0 ? Math.max(...scores) : 0;
+  const currentMin = scores.length > 0 ? Math.min(...scores) : 0;
+
+  const range = currentMax - currentMin || 1;
 
   const sortedByEntry = [...participants].sort(
     (a, b) =>
-      new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
   );
 
   return (
     <div className="space-y-3 w-full overflow-hidden">
+      {/* Definição da animação de "corrida/pulo" */}
+      <style jsx global>{`
+        /* 1. Animação da Pista (Efeito de velocidade/scrolling) */
+        @keyframes road-scroll {
+          from {
+            background-position: 0 0;
+          }
+          to {
+            background-position: -30px 0px;
+          } /* Ajuste os valores para mudar a direção/velocidade */
+        }
+        .animate-road {
+          animation: road-scroll 1s linear infinite;
+        }
+
+        /* 2. Animação do Avatar (Pulo/Corrida) */
+        @keyframes run-bounce {
+          0%,
+          100% {
+            transform: translateY(0) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-3px) rotate(3deg);
+          }
+        }
+        .animate-avatar {
+          animation: run-bounce 0.6s infinite ease-in-out;
+        }
+      `}</style>
+
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-1.5 text-primary font-black uppercase text-[9px] tracking-widest">
           <Timer className="h-3 w-3" />
-          Corrida em Tempo Real - Live Race
+          {t.room.real_time_race}
         </div>
-        <div className="text-[9px] font-bold text-muted-foreground uppercase bg-muted/50 px-2 py-0.5 rounded-full">
-          Lider: {maxScore}
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 rounded-full hover:bg-muted"
+            onClick={() => setEnableAnimations(!enableAnimations)}
+            title={
+              enableAnimations
+                ? "Desativar animações (Modo Econômico)"
+                : "Ativar animações"
+            }
+          >
+            {enableAnimations ? (
+              <Zap className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+            ) : (
+              <ZapOff className="h-3 w-3 text-muted-foreground" />
+            )}
+          </Button>
+          <div className="text-[9px] font-bold text-muted-foreground uppercase bg-muted/50 px-2 py-0.5 rounded-full">
+            Lider: {currentMax}
+          </div>
         </div>
       </div>
 
       <Card className="relative overflow-hidden border-none shadow-xl bg-[#1a1a1a]">
+        {/* Bordas decorativas estilo pista */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_8px,#fff_8px,#fff_16px)] opacity-30" />
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_8px,#fff_8px,#fff_16px)] opacity-30" />
 
-        {/* pr-12 para garantir que o texto nao corte no final da pista */}
-        <div className="py-6 pl-2 pr-12 space-y-1 relative min-h-[160px] bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:15px_15px]">
-          <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-white/10" />
+        <div
+          className={`py-6 pl-2 pr-12 space-y-1 relative min-h-[160px] bg-[#222] ${
+            enableAnimations ? "animate-road" : ""
+          }`}
+          style={{
+            backgroundImage: "radial-gradient(#444 1px, transparent 1px)",
+            backgroundSize: "15px 15px",
+          }}
+        >
+          <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-white/10 z-0">
+            <span className="absolute -top-4 -left-1 text-[8px] text-muted-foreground font-mono">
+              {currentMin}
+            </span>
+          </div>
 
           <div
-            className="absolute right-0 top-0 bottom-0 w-8 md:w-12 opacity-20"
+            className="absolute right-0 top-0 bottom-0 w-8 md:w-12 opacity-20 pointer-events-none"
             style={{
               backgroundImage: `conic-gradient(#fff 0.25turn, #000 0.25turn 0.5turn, #fff 0.5turn 0.75turn, #000 0.75turn)`,
               backgroundSize: "12px 12px",
             }}
           />
 
-          {sortedByEntry.map((participant) => {
-            const progress = (participant.items_eaten / maxScore) * 100;
+          {sortedByEntry.map((participant, index) => {
+            const relativeScore = participant.items_eaten - currentMin;
+            const progress = Math.min(
+              100,
+              Math.max(0, (relativeScore / range) * 100),
+            );
             const isLeader =
-              participant.items_eaten === maxScore && maxScore > 0;
-
-            // Define o estilo baseado no time
-            const teamStyle =
-              isTeamMode && participant.team
-                ? TEAM_COLORS[participant.team as keyof typeof TEAM_COLORS]
-                : "border-white/5 bg-[#1a1a1a]/80 text-white";
+              participant.items_eaten === currentMax && currentMax > 0;
 
             return (
               <div
@@ -73,14 +142,18 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
                 <div className="absolute bottom-0 left-2 right-2 h-px bg-white/5" />
 
                 <div
-                  className="absolute transition-all duration-1000 ease-in-out flex items-center gap-1"
+                  className={`absolute flex items-center gap-1 ${
+                    enableAnimations
+                      ? "transition-all duration-1000 ease-in-out"
+                      : ""
+                  }`}
                   style={{
                     left: `${progress}%`,
                     transform: `translateX(-${progress}%)`,
                     zIndex: isLeader ? 20 : 10,
                   }}
                 >
-                  {/* Caixa de informacoes com a cor do time */}
+                  {/* Caixa de informações */}
                   <div className="flex flex-col min-w-[64px] p-1 text-right text-white">
                     <span className="text-[9px] font-black uppercase leading-none truncate max-w-[80px] md:max-w-[120px]">
                       <span className="inline-flex items-center justify-end gap-1">
@@ -98,7 +171,16 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
                       {participant.items_eaten}pts
                     </span>
                   </div>
-                  <div className="relative shrink-0 w-14 h-14 md:w-16 md:h-16 flex items-center justify-center">
+
+                  <div
+                    className={`relative shrink-0 w-14 h-14 md:w-16 md:h-16 flex items-center justify-center ${
+                      enableAnimations ? "animate-avatar" : ""
+                    }`}
+                    style={{
+                      // Adiciona um atraso para que eles não pulem todos juntos (efeito mais orgânico)
+                      animationDelay: `${index * 0.15}s`,
+                    }}
+                  >
                     {isImageAvatar(participant.avatar) ? (
                       <img
                         src={getAvatarUrl(participant.avatar)}
@@ -108,7 +190,8 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
                     ) : (
                       <span className="inline-block h-11 w-11 rounded-full bg-white/10 md:h-14 md:w-14" />
                     )}
-                    {/* Pequeno indicador de cor acima do avatar (opcional) */}
+
+                    {/* Indicador de time */}
                     {isTeamMode && participant.team && (
                       <div
                         className={`absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full border border-black/50 ${TEAM_COLORS[
@@ -125,11 +208,6 @@ export function RaceTrack({ participants, isTeamMode }: RaceTrackProps) {
           })}
         </div>
       </Card>
-
-      <div className="flex justify-between px-2 opacity-30 text-[8px] font-bold uppercase">
-        <span>Largada</span>
-        <span>Chegada</span>
-      </div>
     </div>
   );
 }
