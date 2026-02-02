@@ -3,14 +3,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import {
-  Plus,
-  ArrowLeft,
-  Settings,
-  Users,
-  Link as LinkIcon,
-  UserPlus,
-} from "lucide-react";
+import { Plus, ArrowLeft, Settings, Users, UserPlus } from "lucide-react";
 import confetti from "canvas-confetti";
 
 import { RoomHeader } from "@/components/room/room-header";
@@ -20,7 +13,7 @@ import { RankingSection } from "@/components/room/ranking-section";
 import { HallOfFame } from "@/components/room/hall-of-fame";
 import { RaceTrack } from "@/components/room/race-track";
 import { LoadingScreen } from "@/components/room/loading-screen";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { JoinRoomViaLink } from "@/components/room/join-room-via-link"; // NOVO IMPORT
 
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
 import { Button } from "@/components/ui/button";
@@ -29,8 +22,6 @@ import { Label } from "@/components/ui/label";
 import type { Race, Participant } from "@/types/database";
 import { TeamSelection } from "@/components/room/team-selection";
 import { useLanguage } from "@/contexts/language-context";
-import { Card } from "@/components/ui/card"; // Importante para o formulário
-import { LanguageToggle } from "@/components/language-toggle";
 
 export default function RoomPage() {
   const { t } = useLanguage();
@@ -49,10 +40,6 @@ export default function RoomPage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [isEnding, setIsEnding] = useState(false);
-
-  // States para o fluxo de "Join via Link"
-  const [nicknameToJoin, setNicknameToJoin] = useState("");
-  const [isJoining, setIsJoining] = useState(false);
 
   // States existentes
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
@@ -159,38 +146,6 @@ export default function RoomPage() {
       console.error(error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleJoinViaLink = async () => {
-    if (!nicknameToJoin.trim() || !race) return;
-    setIsJoining(true);
-
-    try {
-      const supabase = createClient();
-
-      const { data: newParticipant, error } = await supabase
-        .from("participants")
-        .insert({
-          race_id: race.id,
-          name: nicknameToJoin.trim(),
-          items_eaten: 0,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      const storageKey = getParticipantStorageKey(roomCode);
-      localStorage.setItem(storageKey, newParticipant.id);
-      setCurrentParticipantId(newParticipant.id);
-
-      await loadRoomData();
-    } catch (error) {
-      console.error("Erro ao entrar:", error);
-      alert("Erro ao entrar na sala. Tente novamente.");
-    } finally {
-      setIsJoining(false);
     }
   };
 
@@ -418,7 +373,6 @@ export default function RoomPage() {
       .subscribe();
 
     return () => {
-      // ... cleanup
       if (cooldownToastTimeoutRef.current) {
         clearTimeout(cooldownToastTimeoutRef.current);
       }
@@ -501,57 +455,15 @@ export default function RoomPage() {
     );
   }
 
+  // --- ALTERAÇÃO AQUI: Se não estiver participando, mostra o novo componente ---
   if (!currentParticipantId && !isSpectator) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-orange-100/50 via-background to-background dark:from-purple-950/50 dark:via-black dark:to-black p-6 flex flex-col items-center justify-center">
-        <div className="w-full max-w-sm space-y-6">
-          <div className="flex w-full justify-end space-between gap-2">
-            <LanguageToggle />
-            <ThemeToggle />
-          </div>
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-black uppercase tracking-tight text-primary">
-              {t.room.join_via_link_title}
-            </h1>
-            <p className="text-muted-foreground">
-              {t.room.competition_of}{" "}
-              <span className="font-bold text-foreground">
-                {race.food_type}
-              </span>
-            </p>
-          </div>
-
-          <Card className="p-6 border-2 border-primary/20 shadow-xl bg-background/60 backdrop-blur">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>{t.room.enter_nickname_to_join}</Label>
-                <Input
-                  className="h-11 text-lg"
-                  autoFocus
-                  value={nicknameToJoin}
-                  onChange={(e) => setNicknameToJoin(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleJoinViaLink();
-                  }}
-                />
-              </div>
-              <Button
-                className="w-full h-11 text-lg font-bold uppercase rounded-xl"
-                onClick={handleJoinViaLink}
-                disabled={isJoining || !nicknameToJoin.trim()}
-              >
-                {isJoining ? t.common.loading : t.room.join_action}
-              </Button>
-            </div>
-          </Card>
-
-          <div className="flex justify-center">
-            <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
-              {t.common.back}
-            </Button>
-          </div>
-        </div>
-      </div>
+      <JoinRoomViaLink
+        race={race}
+        roomCode={roomCode}
+        onJoin={loadRoomData}
+        onBack={() => router.push("/")}
+      />
     );
   }
 
@@ -574,14 +486,13 @@ export default function RoomPage() {
           }
         />
 
-        {/* ATUALIZAÇÃO NO ROOM INFO: Copiar URL completa */}
+        {/* Room Info, etc. (Código original mantido abaixo) */}
         <RoomInfo
           race={race}
           participantsCount={participants.length}
           roomCode={roomCode}
           copied={copied}
           onCopyCode={() => {
-            // Copia a URL completa do navegador
             const inviteUrl = window.location.href;
             navigator.clipboard.writeText(inviteUrl);
             setCopied(true);
@@ -627,7 +538,6 @@ export default function RoomPage() {
           />
         )}
 
-        {/* Lógica modificada: Mostra aviso se tiver apenas 1, Pista se tiver 2+ */}
         {participants.length === 1 ? (
           <div className="flex flex-col items-center justify-center py-10 px-4 space-y-4 rounded-xl border-2 border-dashed border-muted/60 bg-muted/5 text-center animate-in fade-in zoom-in duration-500">
             <div className="p-4 bg-muted/20 rounded-full relative">
@@ -661,7 +571,6 @@ export default function RoomPage() {
         />
       </div>
 
-      {/* Botão flutuante + (Apenas se já for participante) */}
       {currentParticipant && (
         <div className="fixed right-6 flex flex-col items-end gap-2 pb-[env(safe-area-inset-bottom)] bottom-6">
           <Button
@@ -678,7 +587,6 @@ export default function RoomPage() {
         </div>
       )}
 
-      {/* Botão Voltar */}
       <div className="fixed left-4 bottom-4 sm:left-6 sm:bottom-6 pb-[env(safe-area-inset-bottom)] z-40">
         <Button
           variant="outline"
@@ -733,7 +641,6 @@ export default function RoomPage() {
             )}
             {showPasswordForm && (
               <div className="space-y-2 rounded-xl border border-muted/60 bg-background/70 p-3">
-                {/* ... form de senha (simplificado aqui para não estourar limite, mas mantenha o original) */}
                 <div className="space-y-2">
                   <Label className="text-xs uppercase font-bold text-muted-foreground">
                     {t.account.current_password}

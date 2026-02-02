@@ -1,19 +1,33 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/language-context";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default function PrivacyPage() {
+  const router = useRouter();
   const { t } = useLanguage();
   const privacy = t.privacy_page;
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-orange-100/50 via-background to-background dark:from-purple-950/50 dark:via-black dark:to-black px-6 pb-12 pt-10">
       <div className="mx-auto max-w-3xl space-y-8">
-        <div className="flex w-full justify-end space-between gap-2">
-          <LanguageToggle />
-          <ThemeToggle />
+        <div className="flex justify-between items-center mb-6">
+          <Button
+            variant="outline"
+            onClick={() => router.push("/")}
+            className="rounded-xl font-semibold gap-2 shadow-sm bg-background/90 backdrop-blur"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t.common.exit}
+          </Button>
+          <div className="flex w-full justify-end space-between gap-2">
+            <LanguageToggle />
+            <ThemeToggle />
+          </div>
         </div>
 
         <header className="space-y-3">

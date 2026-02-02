@@ -4,14 +4,18 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import { ThemeProvider } from "@/components/theme-provider";
-import { LanguageProvider } from "@/contexts/language-context"; // <--- Importante
+import { LanguageProvider } from "@/contexts/language-context";
 import "./globals.css";
-
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 // Adicione isto para corrigir o comportamento de zoom no iPhone
 import type { Viewport } from "next";
+
+const _geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
+const _geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+});
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -88,18 +92,24 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
-        <Script
-          async
-          strategy="beforeInteractive"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1440388984648676"
-          crossOrigin="anonymous"
-        />
+        {/* O Script foi removido daqui para evitar o erro de hidratação */}
       </head>
-      <body className="font-sans antialiased">
+      {/* Adicionei as variáveis das fontes aqui também para garantir que carreguem */}
+      <body
+        className={`${_geist.variable} ${_geistMono.variable} font-sans antialiased`}
+      >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <LanguageProvider>{children}</LanguageProvider>
         </ThemeProvider>
         <Analytics />
+
+        {/* O Script agora fica aqui, gerenciado pelo Next.js corretamente */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1440388984648676"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
