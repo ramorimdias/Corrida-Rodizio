@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Race, Participant } from "@/types/database";
 import { getAvatarUrl, isImageAvatar } from "@/lib/utils/avatars";
 import { useLanguage } from "@/contexts/language-context";
+import { ShareStoryButton } from "./share-story-button";
 
 const TEAM_OPTIONS = [
   { id: "AZUL", shortLabel: "Azul", pillClass: "bg-blue-500/20 text-blue-300" },
@@ -122,14 +123,14 @@ export function HallOfFame({
             );
           })}
         </div>
+        <div className="flex flex-col items-center gap-4 pt-4 w-full">
+          <ShareStoryButton
+            race={race}
+            participants={participants}
+            maxScore={maxScore}
+            getItemLabel={getItemLabel}
+          />
 
-        <div className="flex flex-col items-center gap-6 pt-4">
-          <div className="flex items-center gap-2 text-zinc-500 animate-bounce">
-            <Instagram className="h-4 w-4" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-              {t.hall_of_fame.print_post}
-            </span>
-          </div>
           <Button
             variant="outline"
             className="w-full rounded-2xl border-white/10 bg-white/5 hover:bg-white/10"

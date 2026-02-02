@@ -208,6 +208,7 @@ export const translations = {
         "O campeão come mais, mas você comeu bem!",
         "Derrota honrosa: saiu andando, não rolando!",
       ],
+      share: "Postar nos Stories!",
     },
     terms_page: {
       header_label: "📄 Termos de Uso",
@@ -558,6 +559,7 @@ export const translations = {
         "The champion eats more, but you ate well!",
         "Honorable defeat: left walking, not rolling!",
       ],
+      share: "Share to Stories!",
     },
     terms_page: {
       header_label: "📄 Terms of Use",
@@ -907,6 +909,7 @@ export const translations = {
         "El campeón come más, ¡pero tú comiste bien!",
         "Derrota honrosa: ¡saliste andando, no rodando!",
       ],
+      share: "¡Compartir en Historias!",
     },
     footer: {
       copyright: "© {{year}} Passa Raiva. Todos los derechos reservados.",
