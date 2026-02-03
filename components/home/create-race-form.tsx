@@ -92,7 +92,7 @@ export function CreateRaceForm({
         <Label className="text-xs uppercase font-bold text-muted-foreground px-1">
           {t.home.category_label}
         </Label>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-3 gap-3">
           {foodTypes.map(({ type, label, icon: Icon }) => (
             <button
               key={type}
