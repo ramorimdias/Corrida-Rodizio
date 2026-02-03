@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pizza, Fish, Beef, Settings } from "lucide-react";
+import { Pizza, Fish, Beef, Beer, Settings } from "lucide-react";
 import type { FoodType, Race } from "@/types/database";
 import { generateRoomCode } from "@/lib/utils/room-code";
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
@@ -26,7 +26,7 @@ const LOGIN_STORAGE_KEY = "rodizio-race-login";
 
 export default function Home() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // ESTADOS PRINCIPAIS
   const [playerName, setPlayerName] = useState("");
@@ -77,11 +77,29 @@ export default function Home() {
     setCurrentPage(1);
   };
 
-  const foodTypes = [
-    { type: "pizza" as FoodType, label: "Pizza", icon: Pizza },
-    { type: "sushi" as FoodType, label: "Japa", icon: Fish },
-    { type: "burger" as FoodType, label: "Burger", icon: Beef },
-  ];
+  const foodTypeOptions: Record<string, { type: FoodType; label: string; icon: typeof Pizza }[]> =
+    {
+      pt: [
+        { type: "pizza", label: "Pizza", icon: Pizza },
+        { type: "sushi", label: "Japa", icon: Fish },
+        { type: "burger", label: "Burger", icon: Beef },
+        { type: "drinks", label: "Bebida", icon: Beer },
+      ],
+      en: [
+        { type: "pizza", label: "Pizza", icon: Pizza },
+        { type: "sushi", label: "Sushi", icon: Fish },
+        { type: "burger", label: "Burger", icon: Beef },
+        { type: "drinks", label: "Drinks", icon: Beer },
+      ],
+      es: [
+        { type: "pizza", label: "Pizza", icon: Pizza },
+        { type: "sushi", label: "Sushi", icon: Fish },
+        { type: "burger", label: "Burger", icon: Beef },
+        { type: "drinks", label: "Bebidas", icon: Beer },
+      ],
+    };
+
+  const foodTypes = foodTypeOptions[language] ?? foodTypeOptions.pt;
 
   useEffect(() => {
     const storedLogin = localStorage.getItem(LOGIN_STORAGE_KEY);
