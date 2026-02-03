@@ -7,9 +7,13 @@ export function SonnerProvider() {
     <Toaster
       richColors
       closeButton
-      position="top-right"
+      position="bottom-right"
+      theme="system"
       toastOptions={{
         duration: 4000,
+        className:
+          "border border-border bg-background text-foreground shadow-lg",
+        descriptionClassName: "text-muted-foreground",
       }}
     />
   );
