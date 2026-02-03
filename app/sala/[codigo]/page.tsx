@@ -19,6 +19,7 @@ import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 import type { Race, Participant } from "@/types/database";
 import { TeamSelection } from "@/components/room/team-selection";
 import { useLanguage } from "@/contexts/language-context";
@@ -54,6 +55,12 @@ export default function RoomPage() {
   const [passwordStatus, setPasswordStatus] = useState<string | null>(null);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [showPasswordSuccess, setShowPasswordSuccess] = useState(false);
+  const [showConnectOverlay, setShowConnectOverlay] = useState(false);
+  const [accountFlow, setAccountFlow] = useState<"login" | "create">("login");
+  const [accountUsername, setAccountUsername] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [accountStatus, setAccountStatus] = useState<string | null>(null);
+  const [accountLoading, setAccountLoading] = useState(false);
   const [isIosDevice, setIsIosDevice] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [showAddToHomeHelp, setShowAddToHomeHelp] = useState(false);
@@ -342,6 +349,119 @@ export default function RoomPage() {
     }
   };
 
+  const resetConnectForm = () => {
+    setAccountUsername("");
+    setAccountPassword("");
+    setAccountStatus(null);
+  };
+
+  const closeConnectOverlay = () => {
+    setShowConnectOverlay(false);
+    resetConnectForm();
+  };
+
+  const attachLoginToParticipant = async (normalizedUsername: string) => {
+    if (!race || !currentParticipant) return;
+    const supabase = createClient();
+    const { data: existingParticipant } = await supabase
+      .from("participants")
+      .select("id, items_eaten, avatar, team, name")
+      .eq("race_id", race.id)
+      .eq("login_code", normalizedUsername)
+      .maybeSingle();
+
+    const storageKey = getParticipantStorageKey(roomCode);
+
+    if (existingParticipant && existingParticipant.id !== currentParticipant.id) {
+      const itemsToKeep = Math.max(
+        existingParticipant.items_eaten ?? 0,
+        currentParticipant.items_eaten ?? 0,
+      );
+      await supabase
+        .from("participants")
+        .update({
+          items_eaten: itemsToKeep,
+          avatar: currentParticipant.avatar ?? existingParticipant.avatar,
+          team: currentParticipant.team ?? existingParticipant.team,
+          name: currentParticipant.name ?? existingParticipant.name,
+        })
+        .eq("id", existingParticipant.id);
+      await supabase
+        .from("participants")
+        .delete()
+        .eq("id", currentParticipant.id);
+      localStorage.setItem(storageKey, existingParticipant.id);
+      setCurrentParticipantId(existingParticipant.id);
+    } else {
+      await supabase
+        .from("participants")
+        .update({ login_code: normalizedUsername })
+        .eq("id", currentParticipant.id);
+      localStorage.setItem(storageKey, currentParticipant.id);
+    }
+
+    localStorage.setItem(LOGIN_STORAGE_KEY, normalizedUsername);
+    setLoggedUsername(normalizedUsername);
+    await loadRoomData();
+  };
+
+  const handleConnectLogin = async () => {
+    if (!accountUsername.trim() || !accountPassword.trim()) return;
+    setAccountLoading(true);
+    setAccountStatus(null);
+    try {
+      const supabase = createClient();
+      const normalizedUsername = accountUsername.trim().toUpperCase();
+      const { data, error } = await supabase.rpc("verify_login", {
+        p_username: normalizedUsername,
+        p_password: accountPassword,
+      });
+
+      if (error || !data) {
+        setAccountStatus(t.account.invalid_credentials);
+        return;
+      }
+
+      await attachLoginToParticipant(normalizedUsername);
+      closeConnectOverlay();
+    } catch (error) {
+      console.error(error);
+      setAccountStatus(t.account.connect_error);
+    } finally {
+      setAccountLoading(false);
+    }
+  };
+
+  const handleConnectCreate = async () => {
+    if (!accountUsername.trim() || !accountPassword.trim()) return;
+    if (accountPassword.trim().length < 6) {
+      setAccountStatus(t.account.password_too_short);
+      return;
+    }
+    setAccountLoading(true);
+    setAccountStatus(null);
+    try {
+      const supabase = createClient();
+      const normalizedUsername = accountUsername.trim().toUpperCase();
+      const { data, error } = await supabase.rpc("create_login", {
+        p_username: normalizedUsername,
+        p_password: accountPassword,
+      });
+      if (error || !data) {
+        setAccountStatus(t.account.create_error);
+        return;
+      }
+
+      await attachLoginToParticipant(normalizedUsername);
+      closeConnectOverlay();
+    } catch (error) {
+      console.error(error);
+      setAccountStatus(t.account.connect_error);
+    } finally {
+      setAccountLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadRoomData();
     const storedLogin = localStorage.getItem(LOGIN_STORAGE_KEY);
@@ -482,7 +602,20 @@ export default function RoomPage() {
                 <Settings className="mr-2 h-3.5 w-3.5" />
                 {t.common.connected_as} &quot;{loggedUsername}&quot;
               </button>
-            ) : null
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setAccountFlow("login");
+                  setShowConnectOverlay(true);
+                  setAccountStatus(null);
+                }}
+                className="inline-flex items-center rounded-xl border border-muted/60 bg-background/80 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground backdrop-blur transition hover:border-primary/40 hover:text-primary"
+              >
+                <UserPlus className="mr-2 h-3.5 w-3.5" />
+                {t.account.connect_pill}
+              </button>
+            )
           }
         />
 
@@ -599,6 +732,110 @@ export default function RoomPage() {
       </div>
 
       {/* OVERLAYS E MODAIS (Settings, Logout, etc) */}
+      {!loggedUsername && showConnectOverlay && (
+        <>
+          <div
+            className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm"
+            onClick={closeConnectOverlay}
+          />
+          <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+            <Card className="w-full max-w-sm space-y-4 rounded-2xl border border-muted/60 bg-background/95 p-5 shadow-xl">
+              <div className="space-y-1 text-center">
+                <h2 className="text-lg font-bold">{t.account.connect_title}</h2>
+                <p className="text-sm text-muted-foreground">
+                  {t.account.connect_description}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-2 rounded-xl bg-muted/40 p-1 text-xs font-bold uppercase">
+                <button
+                  type="button"
+                  className={`rounded-lg py-2 transition ${
+                    accountFlow === "login"
+                      ? "bg-background text-primary shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  onClick={() => {
+                    setAccountFlow("login");
+                    setAccountStatus(null);
+                  }}
+                >
+                  {t.account.login_tab}
+                </button>
+                <button
+                  type="button"
+                  className={`rounded-lg py-2 transition ${
+                    accountFlow === "create"
+                      ? "bg-background text-primary shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  onClick={() => {
+                    setAccountFlow("create");
+                    setAccountStatus(null);
+                  }}
+                >
+                  {t.account.create_tab}
+                </button>
+              </div>
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label>{t.account.username_label}</Label>
+                  <Input
+                    value={accountUsername}
+                    onChange={(event) => setAccountUsername(event.target.value)}
+                    placeholder={t.account.username_placeholder}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t.account.password_label}</Label>
+                  <Input
+                    type="password"
+                    value={accountPassword}
+                    onChange={(event) => setAccountPassword(event.target.value)}
+                    placeholder={t.account.password_placeholder}
+                    onKeyDown={(event) => {
+                      if (event.key !== "Enter") return;
+                      if (accountFlow === "login") {
+                        handleConnectLogin();
+                      } else {
+                        handleConnectCreate();
+                      }
+                    }}
+                  />
+                </div>
+                {accountStatus && (
+                  <p className="text-xs text-destructive">{accountStatus}</p>
+                )}
+                <Button
+                  className="w-full"
+                  disabled={
+                    accountLoading ||
+                    !accountUsername.trim() ||
+                    !accountPassword.trim()
+                  }
+                  onClick={
+                    accountFlow === "login"
+                      ? handleConnectLogin
+                      : handleConnectCreate
+                  }
+                >
+                  {accountLoading
+                    ? t.common.loading
+                    : accountFlow === "login"
+                    ? t.account.login_btn
+                    : t.account.create_btn}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full"
+                  onClick={closeConnectOverlay}
+                >
+                  {t.common.back}
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </>
+      )}
       {loggedUsername && showAccountOverlay && (
         <>
           <div
