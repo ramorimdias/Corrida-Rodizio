@@ -505,6 +505,7 @@ export default function Home() {
     try {
       const supabase = createClient();
       const normalized = roomCode.toUpperCase();
+      const normalizedLoginCode = loginCode?.trim().toUpperCase() ?? null;
 
       // 1. Verificar se a sala existe e está ativa
       const { data: race, error: raceError } = await supabase
@@ -524,14 +525,33 @@ export default function Home() {
       // 2. Tentar encontrar um participante existente com este nome nesta sala
       const { data: existingParticipant } = await supabase
         .from("participants")
-        .select("id")
+        .select("id, login_code")
         .eq("race_id", race.id)
-        .eq("name", normalizedName)
+        .ilike("name", normalizedName)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
 
       if (existingParticipant) {
+        const existingLoginCode = existingParticipant.login_code?.toUpperCase();
+        const hasExistingAccount = !!existingLoginCode;
+        const hasCurrentAccount = !!normalizedLoginCode;
+        const isSameAccount =
+          hasExistingAccount &&
+          hasCurrentAccount &&
+          existingLoginCode === normalizedLoginCode;
+
+        if (
+          (hasExistingAccount && !isSameAccount) ||
+          (hasCurrentAccount && !hasExistingAccount)
+        ) {
+          toast.error(
+            t.room?.codename_taken ??
+              "Outro jogador já está usando esse codinome.",
+          );
+          return;
+        }
+
         // Se encontrar, re-associa o usuário ao registro antigo (mantém o status VIP se houver)
         localStorage.setItem(
           getParticipantStorageKey(normalized),
