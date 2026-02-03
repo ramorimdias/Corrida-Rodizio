@@ -102,6 +102,7 @@ export default function Home() {
   useEffect(() => {
     let isMounted = true;
     const loadDefaultAvatar = async () => {
+      if (DEFAULT_AVATAR) return;
       try {
         const response = await fetch("/api/avatars");
         if (!response.ok) return;
@@ -196,6 +197,32 @@ export default function Home() {
       error = fallback.error;
     }
     return { data, error };
+  };
+
+  const getLastUsedAvatar = async (
+    supabase: any,
+    login: string | null,
+    name: string,
+  ) => {
+    try {
+      let query = supabase
+        .from("participants")
+        .select("avatar")
+        .not("avatar", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (login) {
+        query = query.eq("login_code", login);
+      } else {
+        query = query.eq("name", name);
+      }
+
+      const { data } = await query.maybeSingle();
+      return data?.avatar ?? defaultAvatar;
+    } catch {
+      return defaultAvatar;
+    }
   };
 
   // --- LÓGICA DE CONTA ---
@@ -443,13 +470,18 @@ export default function Home() {
       }
       if (raceError) throw raceError;
 
+      const avatarToUse = await getLastUsedAvatar(
+        supabase,
+        loginCode,
+        normalizedName,
+      );
       const { data: participant } = await insertParticipantWithFallback(
         supabase,
         {
           race_id: race.id,
           name: normalizedName,
           items_eaten: 0,
-          avatar: defaultAvatar,
+          avatar: avatarToUse,
           is_vip: true,
           login_code: loginCode,
         },
@@ -509,13 +541,18 @@ export default function Home() {
       }
 
       // 3. Se não encontrar, cria um novo participante
+      const avatarToUse = await getLastUsedAvatar(
+        supabase,
+        loginCode,
+        normalizedName,
+      );
       const { data: participant, error: pError } =
         await insertParticipantWithFallback(supabase, {
           race_id: race.id,
           name: normalizedName,
           items_eaten: 0,
           team: null,
-          avatar: defaultAvatar,
+          avatar: avatarToUse,
           is_vip: false,
           login_code: loginCode,
         });

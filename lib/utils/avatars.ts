@@ -1,6 +1,6 @@
 export const AVATAR_OPTIONS: string[] = [];
 
-export const DEFAULT_AVATAR: string | null = null;
+export const DEFAULT_AVATAR: string | null = "avatar2.png";
 
 const IMAGE_AVATAR_PATTERN = /\.(png|jpe?g|webp|gif)$/i;
 const PREMIUM_AVATAR_PATTERN = /^avatar-premium/i;
