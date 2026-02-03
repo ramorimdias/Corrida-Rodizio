@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, ArrowLeft, Settings, Users, UserPlus } from "lucide-react";
+import { Plus, ArrowLeft, Settings, Check, Copy } from "lucide-react";
 import confetti from "canvas-confetti";
 
 import { RoomHeader } from "@/components/room/room-header";
@@ -74,6 +74,13 @@ export default function RoomPage() {
     y: number;
   } | null>(null);
   const [isAddCooldownActive, setIsAddCooldownActive] = useState(false);
+
+  const handleCopyCode = () => {
+    const inviteUrl = window.location.href;
+    navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const lastAddAtRef = useRef<number | null>(null);
   const cooldownToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -625,12 +632,7 @@ export default function RoomPage() {
           participantsCount={participants.length}
           roomCode={roomCode}
           copied={copied}
-          onCopyCode={() => {
-            const inviteUrl = window.location.href;
-            navigator.clipboard.writeText(inviteUrl);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-          }}
+          onCopyCode={handleCopyCode}
         />
 
         {/* Botão de Encerrar (Apenas VIP) */}
@@ -673,11 +675,27 @@ export default function RoomPage() {
 
         {participants.length === 1 ? (
           <div className="flex flex-col items-center justify-center py-10 px-4 space-y-4 rounded-xl border-2 border-dashed border-muted/60 bg-muted/5 text-center animate-in fade-in zoom-in duration-500">
-            <div className="p-4 bg-muted/20 rounded-full relative">
-              <Users className="w-8 h-8 text-muted-foreground/70" />
-              <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1">
-                <UserPlus className="w-3 h-3" />
+            <div className="flex items-center gap-2 rounded-2xl border border-muted/60 bg-background/60 px-3 py-2 shadow-sm">
+              <div className="text-right leading-none">
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  {t.common.room}
+                </p>
+                <p className="font-mono font-bold text-lg leading-none">
+                  {roomCode}
+                </p>
               </div>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={handleCopyCode}
+                className="h-9 w-9 rounded-xl border border-muted/50 bg-background/80 hover:cursor-pointer"
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
             </div>
             <div className="space-y-1">
               <h3 className="font-semibold text-lg text-foreground">
