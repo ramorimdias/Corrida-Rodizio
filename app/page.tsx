@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,6 @@ const LOGIN_STORAGE_KEY = "rodizio-race-login";
 
 export default function Home() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { t } = useLanguage();
 
   // ESTADOS PRINCIPAIS
@@ -68,9 +67,6 @@ export default function Home() {
   const [isIosDevice, setIsIosDevice] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [showAddToHomeHelp, setShowAddToHomeHelp] = useState(false);
-
-  const flowParam = searchParams.get("flow");
-  const accountParam = searchParams.get("account");
 
   const toggleHistory = () => {
     if (!showHistory && myGroups.length === 0) {
@@ -144,58 +140,9 @@ export default function Home() {
     }
   }, [flow]);
 
-  useEffect(() => {
-    if (flowParam === "create" || flowParam === "join") {
-      setFlow(flowParam);
-      return;
-    }
-    setFlow(null);
-  }, [flowParam]);
-
-  useEffect(() => {
-    if (accountParam === "login" || accountParam === "create") {
-      setAccountFlow(accountParam);
-      return;
-    }
-    setAccountFlow(null);
-  }, [accountParam]);
-
   const handlePlayerNameChange = (value: string) => {
     setHasEditedName(true);
     setPlayerName(value);
-  };
-
-  const updateQueryParams = (updates: Record<string, string | null>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-    });
-    const queryString = params.toString();
-    router.push(queryString ? `/?${queryString}` : "/");
-  };
-
-  const handleFlowChange = (nextFlow: "create" | "join" | null) => {
-    setFlow(nextFlow);
-    if (nextFlow) {
-      setAccountFlow(null);
-      updateQueryParams({ flow: nextFlow, account: null });
-      return;
-    }
-    updateQueryParams({ flow: null });
-  };
-
-  const handleAccountFlowChange = (nextFlow: "login" | "create" | null) => {
-    setAccountFlow(nextFlow);
-    if (nextFlow) {
-      setFlow(null);
-      updateQueryParams({ account: nextFlow, flow: null });
-      return;
-    }
-    updateQueryParams({ account: null });
   };
 
   // --- FUNÇÕES DE SUPORTE ---
@@ -297,7 +244,7 @@ export default function Home() {
 
       setLoginCode(data);
       localStorage.setItem(LOGIN_STORAGE_KEY, data);
-      handleAccountFlowChange(null);
+      setAccountFlow(null);
       setAccountPassword("");
       setAccountCodeInput("");
       alert("Conta criada com sucesso!");
@@ -327,7 +274,7 @@ export default function Home() {
 
       setLoginCode(normalizedName);
       localStorage.setItem(LOGIN_STORAGE_KEY, normalizedName);
-      handleAccountFlowChange(null);
+      setAccountFlow(null);
       setAccountPassword("");
       setAccountCodeInput("");
 
@@ -761,7 +708,7 @@ export default function Home() {
                   onLoadGroups={handleLoadGroups}
                   onLogin={handleLogin}
                   onCreateLogin={handleCreateLogin}
-                  setAccountFlow={handleAccountFlowChange}
+                  setAccountFlow={setAccountFlow}
                   setAccountCodeInput={setAccountCodeInput}
                   setAccountPassword={setAccountPassword}
                   onMenuStateChange={setIsAccountMenuOpen}
@@ -806,7 +753,7 @@ export default function Home() {
 
               {!isAccountMenuOpen &&
                 (!flow ? (
-                  <StartActions onSetFlow={handleFlowChange} />
+                  <StartActions onSetFlow={setFlow} />
                 ) : flow === "create" ? (
                   <CreateRaceForm
                     playerName={playerName}
@@ -819,7 +766,7 @@ export default function Home() {
                     loading={loading}
                     onCreate={handleCreateRoom}
                     onBack={() => {
-                      handleFlowChange(null);
+                      setFlow(null);
                       setSelectedFood(null);
                     }}
                   />
@@ -834,7 +781,7 @@ export default function Home() {
                     setIsSpectator={setIsSpectator}
                     onJoin={handleJoinRoom}
                     onBack={() => {
-                      handleFlowChange(null);
+                      setFlow(null);
                       setRoomCode("");
                     }}
                   />
