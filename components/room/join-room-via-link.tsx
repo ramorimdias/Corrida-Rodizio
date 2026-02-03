@@ -13,6 +13,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { LogIn, User, Loader2 } from "lucide-react";
 import type { Race } from "@/types/database";
+import { toast } from "sonner";
 
 interface JoinRoomViaLinkProps {
   race: Race;
@@ -60,7 +61,7 @@ export function JoinRoomViaLink({
       onJoin();
     } catch (error) {
       console.error("Erro ao entrar como convidado:", error);
-      alert("Erro ao entrar na sala. Tente novamente.");
+      toast.error("Erro ao entrar na sala. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -84,7 +85,7 @@ export function JoinRoomViaLink({
       );
 
       if (loginError || !loginSuccess) {
-        alert("Usuário ou senha inválidos.");
+        toast.error("Usuário ou senha inválidos.");
         setLoading(false);
         return;
       }
@@ -126,7 +127,7 @@ export function JoinRoomViaLink({
       onJoin();
     } catch (error) {
       console.error("Erro ao fazer login:", error);
-      alert("Erro ao entrar com a conta. Tente novamente.");
+      toast.error("Erro ao entrar com a conta. Tente novamente.");
     } finally {
       setLoading(false);
     }

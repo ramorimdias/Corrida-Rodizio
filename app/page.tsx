@@ -20,6 +20,7 @@ import { AccountSection } from "@/components/home/account-section";
 import { CreateRaceForm } from "@/components/home/create-race-form";
 import { JoinRaceForm } from "@/components/home/join-race-form";
 import { StartActions } from "@/components/home/start-actions";
+import { toast } from "sonner";
 
 const LOGIN_STORAGE_KEY = "rodizio-race-login";
 
@@ -247,9 +248,9 @@ export default function Home() {
       setAccountFlow(null);
       setAccountPassword("");
       setAccountCodeInput("");
-      alert("Conta criada com sucesso!");
+      toast.success("Conta criada com sucesso!");
     } catch (error: any) {
-      alert(`Erro ao criar conta: ${error.message || "Tente outro nome"}`);
+      toast.error(`Erro ao criar conta: ${error.message || "Tente outro nome"}`);
     } finally {
       setAccountLoading(false);
     }
@@ -268,7 +269,7 @@ export default function Home() {
       });
 
       if (error || !data) {
-        alert("Nome de usuário ou senha inválidos.");
+        toast.error("Nome de usuário ou senha inválidos.");
         return;
       }
 
@@ -280,7 +281,7 @@ export default function Home() {
 
       handleLoadGroups(normalizedName);
     } catch (error: any) {
-      alert("Erro ao entrar. Tente novamente.");
+      toast.error("Erro ao entrar. Tente novamente.");
     } finally {
       setAccountLoading(false);
     }
@@ -490,7 +491,7 @@ export default function Home() {
         localStorage.setItem(getParticipantStorageKey(code), participant.id);
       router.push(`/sala/${code}`);
     } catch (e) {
-      alert("Erro ao criar sala.");
+      toast.error("Erro ao criar sala.");
     } finally {
       setLoading(false);
     }
@@ -566,7 +567,7 @@ export default function Home() {
 
       router.push(`/sala/${normalized}`);
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message ?? "Erro ao entrar na sala.");
     } finally {
       setLoading(false);
     }

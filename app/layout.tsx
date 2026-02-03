@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/language-context";
+import { SonnerProvider } from "@/components/sonner-provider";
 import "./globals.css";
 
 // Adicione isto para corrigir o comportamento de zoom no iPhone
@@ -101,6 +102,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <LanguageProvider>{children}</LanguageProvider>
         </ThemeProvider>
+        <SonnerProvider />
         <Analytics />
 
         {/* O Script agora fica aqui, gerenciado pelo Next.js corretamente */}
