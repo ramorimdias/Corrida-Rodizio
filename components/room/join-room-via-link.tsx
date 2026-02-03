@@ -43,37 +43,11 @@ export function JoinRoomViaLink({
 
     try {
       const supabase = createClient();
-      const normalizedNickname = nickname.trim();
-      const { data: existingByName } = await supabase
-        .from("participants")
-        .select("id, login_code")
-        .eq("race_id", race.id)
-        .eq("name", normalizedNickname)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      const storageKey = getParticipantStorageKey(roomCode);
-
-      if (existingByName) {
-        if (existingByName.login_code) {
-          toast.error(
-            t.room?.codename_taken ??
-              "Outro jogador já está usando esse codinome.",
-          );
-          return;
-        }
-
-        localStorage.setItem(storageKey, existingByName.id);
-        onJoin();
-        return;
-      }
-
       const { data: newParticipant, error } = await supabase
         .from("participants")
         .insert({
           race_id: race.id,
-          name: normalizedNickname,
+          name: nickname.trim(),
           items_eaten: 0,
         })
         .select()
@@ -81,6 +55,7 @@ export function JoinRoomViaLink({
 
       if (error) throw error;
 
+      const storageKey = getParticipantStorageKey(roomCode);
       localStorage.setItem(storageKey, newParticipant.id);
 
       onJoin();
@@ -132,32 +107,6 @@ export function JoinRoomViaLink({
         // Se já existe, apenas reconecta
         localStorage.setItem(storageKey, existingParticipant.id);
       } else {
-        const { data: existingByName } = await supabase
-          .from("participants")
-          .select("id, login_code")
-          .eq("race_id", race.id)
-          .eq("name", normalizedUsername)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (existingByName) {
-          if (
-            existingByName.login_code &&
-            existingByName.login_code !== normalizedUsername
-          ) {
-            toast.error(
-              t.room?.codename_taken ??
-                "Outro jogador já está usando esse codinome.",
-            );
-            return;
-          }
-
-          localStorage.setItem(storageKey, existingByName.id);
-          onJoin();
-          return;
-        }
-
         // Se não existe, cria um novo vinculado à conta
         const { data: newParticipant, error: insertError } = await supabase
           .from("participants")

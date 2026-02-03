@@ -524,7 +524,7 @@ export default function Home() {
       // 2. Tentar encontrar um participante existente com este nome nesta sala
       const { data: existingParticipant } = await supabase
         .from("participants")
-        .select("id, login_code")
+        .select("id")
         .eq("race_id", race.id)
         .eq("name", normalizedName)
         .order("created_at", { ascending: false })
@@ -532,19 +532,6 @@ export default function Home() {
         .maybeSingle();
 
       if (existingParticipant) {
-        const isSameAccount =
-          existingParticipant.login_code &&
-          existingParticipant.login_code === loginCode;
-        const hasAccount = !!existingParticipant.login_code;
-
-        if (hasAccount && !isSameAccount) {
-          toast.error(
-            t.room?.codename_taken ??
-              "Outro jogador já está usando esse codinome.",
-          );
-          return;
-        }
-
         // Se encontrar, re-associa o usuário ao registro antigo (mantém o status VIP se houver)
         localStorage.setItem(
           getParticipantStorageKey(normalized),
