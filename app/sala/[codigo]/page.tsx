@@ -23,9 +23,10 @@ import { Card } from "@/components/ui/card";
 import type { Race, Participant } from "@/types/database";
 import { TeamSelection } from "@/components/room/team-selection";
 import { useLanguage } from "@/contexts/language-context";
+import { getFoodTypeUnit } from "@/lib/utils/food-type";
 
 export default function RoomPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const LOGIN_STORAGE_KEY = "rodizio-race-login";
   const addCooldownMs = 2_000;
 
@@ -101,12 +102,7 @@ export default function RoomPage() {
 
   const getItemLabel = (count: number) => {
     if (!race) return "";
-    const labels = {
-      pizza: count === 1 ? "pedaço" : "pedaços",
-      sushi: count === 1 ? "peça" : "peças",
-      burger: count === 1 ? "burger" : "burgers",
-    };
-    return labels[race.food_type as keyof typeof labels] || "unidades";
+    return getFoodTypeUnit(race.food_type, language, count) || "unidades";
   };
 
   const loadRoomData = async () => {

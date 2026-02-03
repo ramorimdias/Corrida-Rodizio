@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/language-context";
+import { getFoodTypeLabel } from "@/lib/utils/food-type";
 import { getParticipantStorageKey } from "@/lib/utils/participant-storage";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
@@ -28,7 +29,8 @@ export function JoinRoomViaLink({
   onJoin,
   onBack,
 }: JoinRoomViaLinkProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const foodTypeLabel = getFoodTypeLabel(race.food_type, language);
   const [mode, setMode] = useState<"guest" | "login">("guest");
   const [loading, setLoading] = useState(false);
 
@@ -203,7 +205,7 @@ export function JoinRoomViaLink({
           </h1>
           <p className="text-muted-foreground">
             {t.room.competition_of}{" "}
-            <span className="font-bold text-foreground">{race.food_type}</span>
+            <span className="font-bold text-foreground">{foodTypeLabel}</span>
           </p>
         </div>
 

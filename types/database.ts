@@ -1,4 +1,4 @@
-export type FoodType = "pizza" | "sushi" | "burger";
+export type FoodType = "pizza" | "sushi" | "burger" | "drinks";
 
 export interface Race {
   id: string;

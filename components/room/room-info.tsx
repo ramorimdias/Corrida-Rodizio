@@ -3,6 +3,7 @@ import { FoodIcon } from "@/components/food-icon";
 import { Button } from "@/components/ui/button";
 import { Race } from "@/types/database";
 import { useLanguage } from "@/contexts/language-context";
+import { getFoodTypeLabel } from "@/lib/utils/food-type";
 
 interface RoomInfoProps {
   race: Race;
@@ -19,7 +20,8 @@ export function RoomInfo({
   copied,
   onCopyCode,
 }: RoomInfoProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const foodTypeLabel = getFoodTypeLabel(race.food_type, language);
 
   return (
     <div className="space-y-2 py-2 sm:space-y-3 sm:py-3">
@@ -36,7 +38,7 @@ export function RoomInfo({
               {t.room.competition_of}
             </h2>
             <h1 className="text-3xl font-black capitalize sm:text-4xl">
-              {race.food_type === "sushi" ? "Rodízio Japa" : race.food_type}
+              {foodTypeLabel}
             </h1>
           </div>
         </div>
