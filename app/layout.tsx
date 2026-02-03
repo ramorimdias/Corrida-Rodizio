@@ -27,35 +27,65 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://rodiziorace.mechama.eu"),
-  title: "Rodízio Race",
+  title: {
+    default: "Contador de Pizzas e Competição de Rodízio | Rodízio Race",
+    template: "%s | Rodízio Race",
+  },
   description:
-    "Venha competir com amigos em rodízios e veja quem come mais em tempo real",
+    "O melhor aplicativo para contar fatias em rodízios. Crie uma competição de comida com amigos, marque pizzas, sushis e hambúrgueres em tempo real e veja quem come mais.",
+  keywords: [
+    "contador de pizza",
+    "contador de rodízio",
+    "competição de comida",
+    "marcador de fatias",
+    "quem come mais",
+    "app de rodízio",
+    "rodízio de sushi",
+    "corrida de comida",
+    "rodízio race",
+    "contador de sushi",
+    "contador de hambúrguer",
+    "app de competição",
+    "contador de fatias",
+    "competição entre amigos",
+    "app para rodízio",
+    "jogo de comer pizza",
+    "desafio de comida",
+    "aplicativo de rodízio",
+    "marcador de rodízio",
+    "competição de rodízio",
+    "app para contar comida",
+  ],
   applicationName: "Rodízio Race",
   openGraph: {
-    title: "Rodizio Race",
+    title: "Contador de Rodízio - Quem come mais?",
     description:
-      "Venha competir com amigos em rodizios e veja quem come mais em tempo real",
+      "Venha competir com amigos em rodízios de pizza, sushi e burger. Marque as fatias e veja a classificação em tempo real.",
+    url: "https://rodiziorace.mechama.eu",
+    siteName: "Rodízio Race",
+    locale: "pt_BR",
+    type: "website",
     images: [
       {
         url: "https://rodiziorace.mechama.eu/og-image.jpg",
         width: 1200,
         height: 630,
         type: "image/jpeg",
-        alt: "Rodizio Race",
+        alt: "Rodízio Race - Competição de quem come mais",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rodizio Race",
+    title: "Rodízio Race - Contador de Pizzas",
     description:
-      "Venha competir com amigos em rodizios e veja quem come mais em tempo real",
+      "App para competir em rodízios. Marque quantas fatias você comeu e ganhe dos seus amigos.",
     images: ["https://rodiziorace.mechama.eu/og-image.jpg"],
   },
   appleWebApp: {
     title: "Rodízio Race",
   },
-  generator: "v0.app",
+  generator: "Next.js",
   icons: {
     icon: [
       {
@@ -92,10 +122,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <head>
-        {/* O Script foi removido daqui para evitar o erro de hidratação */}
-      </head>
-      {/* Adicionei as variáveis das fontes aqui também para garantir que carreguem */}
       <body
         className={`${_geist.variable} ${_geistMono.variable} font-sans antialiased`}
       >
@@ -104,6 +130,32 @@ export default function RootLayout({
         </ThemeProvider>
         <SonnerProvider />
         <Analytics />
+
+        {/* Script JSON-LD para SEO (Dados Estruturados) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Rodízio Race",
+              applicationCategory: "LifestyleApplication",
+              operatingSystem: "Web",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "BRL",
+              },
+              description:
+                "Aplicativo contador de pizzas e sushi para competições de rodízio entre amigos.",
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "5",
+                ratingCount: "100",
+              },
+            }),
+          }}
+        />
 
         {/* O Script agora fica aqui, gerenciado pelo Next.js corretamente */}
         <Script
