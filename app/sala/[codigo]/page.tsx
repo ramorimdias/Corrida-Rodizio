@@ -82,6 +82,15 @@ export default function RoomPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleExit = () => {
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/");
+  };
+
   const lastAddAtRef = useRef<number | null>(null);
   const cooldownToastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -741,7 +750,7 @@ export default function RoomPage() {
       <div className="fixed left-4 bottom-4 sm:left-6 sm:bottom-6 pb-[env(safe-area-inset-bottom)] z-40">
         <Button
           variant="outline"
-          onClick={() => router.push("/")}
+          onClick={handleExit}
           className="rounded-xl font-semibold gap-2 shadow-sm bg-background/90 backdrop-blur"
         >
           <ArrowLeft className="h-4 w-4" />
