@@ -2,7 +2,7 @@
 create table if not exists public.races (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  food_type text not null check (food_type in ('pizza', 'sushi', 'burger')),
+  food_type text not null check (food_type in ('pizza', 'sushi', 'burger', 'drinks')),
   created_at timestamp with time zone default now(),
   ended_at timestamp with time zone,
   is_active boolean default true
