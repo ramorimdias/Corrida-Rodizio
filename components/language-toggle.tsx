@@ -12,7 +12,9 @@ export function LanguageToggle() {
     if (language === "pt") {
       setLanguage("en");
     } else if (language === "en") {
-      setLanguage("es" as any);
+      setLanguage("es");
+    } else if (language === "es") {
+      setLanguage("fr");
     } else {
       setLanguage("pt");
     }
@@ -22,6 +24,7 @@ export function LanguageToggle() {
     pt: "BR",
     en: "EN",
     es: "ES",
+    fr: "FR",
   };
 
   return (

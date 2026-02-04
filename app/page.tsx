@@ -69,6 +69,12 @@ export default function Home() {
   const [isStandalone, setIsStandalone] = useState(false);
   const [showAddToHomeHelp, setShowAddToHomeHelp] = useState(false);
 
+  const notifyLoginUpdated = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("rodizio-login-updated"));
+    }
+  };
+
   const toggleHistory = () => {
     if (!showHistory && myGroups.length === 0) {
       handleLoadGroups();
@@ -96,6 +102,12 @@ export default function Home() {
         { type: "sushi", label: "Sushi", icon: Fish },
         { type: "burger", label: "Burger", icon: Beef },
         { type: "drinks", label: "Bebidas", icon: Beer },
+      ],
+      fr: [
+        { type: "pizza", label: "Pizza", icon: Pizza },
+        { type: "sushi", label: "Sushi", icon: Fish },
+        { type: "burger", label: "Burger", icon: Beef },
+        { type: "drinks", label: "Boissons", icon: Beer },
       ],
     };
 
@@ -263,6 +275,7 @@ export default function Home() {
 
       setLoginCode(data);
       localStorage.setItem(LOGIN_STORAGE_KEY, data);
+      notifyLoginUpdated();
       setAccountFlow(null);
       setAccountPassword("");
       setAccountCodeInput("");
@@ -293,6 +306,7 @@ export default function Home() {
 
       setLoginCode(normalizedName);
       localStorage.setItem(LOGIN_STORAGE_KEY, normalizedName);
+      notifyLoginUpdated();
       setAccountFlow(null);
       setAccountPassword("");
       setAccountCodeInput("");

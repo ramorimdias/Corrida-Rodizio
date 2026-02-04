@@ -414,6 +414,9 @@ export default function RoomPage() {
 
     localStorage.setItem(LOGIN_STORAGE_KEY, normalizedUsername);
     setLoggedUsername(normalizedUsername);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("rodizio-login-updated"));
+    }
     await loadRoomData();
   };
 
