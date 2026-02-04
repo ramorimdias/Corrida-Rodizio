@@ -18,6 +18,8 @@ interface AccountSectionProps {
   accountLoading: boolean;
   accountCodeInput: string;
   accountPassword: string;
+  acceptTerms: boolean;
+  setAcceptTerms: (val: boolean) => void;
   myGroups: any[];
   isLoadingGroups: boolean;
   groupsError: string | null;
@@ -42,6 +44,8 @@ export function AccountSection({
   accountLoading,
   accountCodeInput,
   accountPassword,
+  acceptTerms,
+  setAcceptTerms,
   myGroups,
   isLoadingGroups,
   groupsError,
@@ -239,7 +243,10 @@ export function AccountSection({
               <Button
                 variant="outline"
                 className="w-full h-12 rounded-xl font-semibold"
-                onClick={() => setAccountFlow("create")}
+                onClick={() => {
+                  setAcceptTerms(false);
+                  setAccountFlow("create");
+                }}
               >
                 {t.account.no_account}
               </Button>
@@ -277,6 +284,15 @@ export function AccountSection({
                   className="h-12"
                 />
               </div>
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                />
+                {t.account.accept_terms}
+              </label>
               <Button
                 className="w-full h-12 rounded-xl font-bold"
                 onClick={onCreateLogin}
@@ -287,7 +303,10 @@ export function AccountSection({
               <Button
                 variant="outline"
                 className="w-full h-12 rounded-xl font-semibold"
-                onClick={() => setAccountFlow("login")}
+                onClick={() => {
+                  setAcceptTerms(false);
+                  setAccountFlow("login");
+                }}
               >
                 {t.account.have_account}
               </Button>
@@ -296,7 +315,10 @@ export function AccountSection({
           <Button
             variant="outline"
             className="w-full h-12 rounded-xl font-semibold cursor-pointer"
-            onClick={() => setAccountFlow(null)}
+            onClick={() => {
+              setAcceptTerms(false);
+              setAccountFlow(null);
+            }}
           >
             {t.common.back}
           </Button>

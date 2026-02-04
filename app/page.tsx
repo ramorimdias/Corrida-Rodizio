@@ -47,6 +47,8 @@ export default function Home() {
   );
   const [accountCodeInput, setAccountCodeInput] = useState("");
   const [accountPassword, setAccountPassword] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [loginCode, setLoginCode] = useState<string | null>(null);
   const [accountLoading, setAccountLoading] = useState(false);
   const [myGroups, setMyGroups] = useState<Race[]>([]);
@@ -295,6 +297,10 @@ export default function Home() {
 
   const handleCreateLogin = async () => {
     if (!accountPassword.trim() || !accountCodeInput.trim()) return;
+    if (!acceptTerms) {
+      toast.error(t.account.accept_terms_required);
+      return;
+    }
     setAccountLoading(true);
     setGroupsError(null);
     try {
@@ -308,12 +314,19 @@ export default function Home() {
 
       if (error) throw error;
 
+      await supabase.from("player_profiles").upsert({
+        login_code: data,
+        terms_accepted_at: new Date().toISOString(),
+        terms_version: "v1",
+      });
+
       setLoginCode(data);
       localStorage.setItem(LOGIN_STORAGE_KEY, data);
       notifyLoginUpdated();
       setAccountFlow(null);
       setAccountPassword("");
       setAccountCodeInput("");
+      setAcceptTerms(false);
       toast.success("Conta criada com sucesso!");
     } catch (error: any) {
       toast.error(`Erro ao criar conta: ${error.message || "Tente outro nome"}`);
@@ -870,6 +883,8 @@ export default function Home() {
                   accountLoading={accountLoading}
                   accountCodeInput={accountCodeInput}
                   accountPassword={accountPassword}
+                  acceptTerms={acceptTerms}
+                  setAcceptTerms={setAcceptTerms}
                   myGroups={myGroups}
                   isLoadingGroups={isLoadingGroups}
                   groupsError={groupsError}
