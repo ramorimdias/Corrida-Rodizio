@@ -9,6 +9,9 @@ create table if not exists public.logins (
   created_at timestamptz not null default now()
 );
 
+alter table public.logins
+  add column if not exists preferred_language text;
+
 alter table public.participants
   add column if not exists login_code text;
 

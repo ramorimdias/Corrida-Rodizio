@@ -20,6 +20,12 @@ const foodTypeLabels: Record<Language, Record<FoodType, string>> = {
     burger: "Burger",
     drinks: "Bebidas",
   },
+  fr: {
+    pizza: "Pizza",
+    sushi: "Sushi",
+    burger: "Burger",
+    drinks: "Boissons",
+  },
 };
 
 const foodTypeUnits: Record<Language, Record<FoodType, [string, string]>> = {
@@ -40,6 +46,12 @@ const foodTypeUnits: Record<Language, Record<FoodType, [string, string]>> = {
     sushi: ["pieza", "piezas"],
     burger: ["hamburguesa", "hamburguesas"],
     drinks: ["trago", "tragos"],
+  },
+  fr: {
+    pizza: ["part", "parts"],
+    sushi: ["pièce", "pièces"],
+    burger: ["burger", "burgers"],
+    drinks: ["boisson", "boissons"],
   },
 };
 

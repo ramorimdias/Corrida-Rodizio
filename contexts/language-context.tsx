@@ -1,7 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { translations, type Language } from "@/lib/i18n/translations";
+import { createClient } from "@/lib/supabase/client";
 
 type LanguageContextType = {
   language: Language;
@@ -17,17 +24,90 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // Começamos sempre com 'pt' para garantir que o servidor consiga renderizar
   const [language, setLanguage] = useState<Language>("pt");
 
-  // Assim que carregar no cliente, verificamos se havia uma preferência salva
-  useEffect(() => {
-    const saved = localStorage.getItem("rodizio-lang") as Language;
-    if (saved && (saved === "pt" || saved === "en")) {
-      setLanguage(saved);
+  const normalizeLanguage = (value?: string | null): Language | null => {
+    if (!value) return null;
+    const normalized = value.toLowerCase();
+    if (normalized.startsWith("pt")) return "pt";
+    if (normalized.startsWith("en")) return "en";
+    if (normalized.startsWith("es")) return "es";
+    if (normalized.startsWith("fr")) return "fr";
+    return null;
+  };
+
+  const getBrowserLanguage = (): Language | null => {
+    if (typeof navigator === "undefined") return null;
+    const candidates = [
+      ...(navigator.languages ?? []),
+      navigator.language,
+    ].filter(Boolean) as string[];
+    for (const candidate of candidates) {
+      const match = normalizeLanguage(candidate);
+      if (match) return match;
+    }
+    return null;
+  };
+
+  const loadAccountLanguage = useCallback(async (loginCode: string) => {
+    const normalizedLogin = loginCode.trim().toUpperCase();
+    if (!normalizedLogin) return;
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("logins")
+      .select("preferred_language")
+      .eq("username", normalizedLogin)
+      .maybeSingle();
+    const accountLanguage = normalizeLanguage(data?.preferred_language);
+    if (accountLanguage) {
+      setLanguage(accountLanguage);
+      localStorage.setItem("rodizio-lang", accountLanguage);
     }
   }, []);
+
+  // Assim que carregar no cliente, verificamos se havia uma preferência salva
+  useEffect(() => {
+    const saved = normalizeLanguage(localStorage.getItem("rodizio-lang"));
+    if (saved) {
+      setLanguage(saved);
+      return;
+    }
+
+    const browserLanguage = getBrowserLanguage();
+    if (browserLanguage) {
+      setLanguage(browserLanguage);
+      localStorage.setItem("rodizio-lang", browserLanguage);
+    }
+  }, []);
+
+  useEffect(() => {
+    const storedLogin = localStorage.getItem("rodizio-race-login");
+    if (storedLogin) {
+      void loadAccountLanguage(storedLogin);
+    }
+
+    const handleLoginUpdated = () => {
+      const latestLogin = localStorage.getItem("rodizio-race-login");
+      if (latestLogin) {
+        void loadAccountLanguage(latestLogin);
+      }
+    };
+
+    window.addEventListener("rodizio-login-updated", handleLoginUpdated);
+    return () => {
+      window.removeEventListener("rodizio-login-updated", handleLoginUpdated);
+    };
+  }, [loadAccountLanguage]);
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
     localStorage.setItem("rodizio-lang", lang);
+    const storedLogin = localStorage.getItem("rodizio-race-login");
+    if (storedLogin) {
+      const supabase = createClient();
+      void supabase
+        .from("logins")
+        .update({ preferred_language: lang })
+        .eq("username", storedLogin.trim().toUpperCase());
+    }
   };
 
   return (
