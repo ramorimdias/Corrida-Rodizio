@@ -99,6 +99,8 @@ export default function RoomPage() {
   const addCooldownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+  const formatAccountLabel = (value: string) =>
+    value.length > 16 ? `${value.slice(0, 16)}...` : value;
 
   const getItemLabel = (count: number) => {
     if (!race) return "";
@@ -612,10 +614,10 @@ export default function RoomPage() {
               <button
                 type="button"
                 onClick={toggleAccountOverlay}
-                className="inline-flex items-center rounded-xl border border-muted/60 bg-background/80 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground backdrop-blur transition hover:border-primary/40 hover:text-primary"
+                className="inline-flex items-center rounded-xl border border-muted/60 bg-background/80 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground backdrop-blur transition hover:border-primary/40 hover:text-primary whitespace-nowrap"
               >
                 <Settings className="mr-2 h-3.5 w-3.5" />
-                {t.common.connected_as} &quot;{loggedUsername}&quot;
+                {formatAccountLabel(loggedUsername)}
               </button>
             ) : (
               <button
@@ -710,8 +712,7 @@ export default function RoomPage() {
                 {t.room.waiting_participants}
               </h3>
               <p className="text-xs text-muted-foreground max-w-[280px] mx-auto">
-                Copie o link acima e mande para seus amigos. A corrida começa
-                quando houver 2 pessoas na mesa.
+                {t.room.share_invite_help}
               </p>
             </div>
           </div>

@@ -109,6 +109,10 @@ export const translations = {
       team_yellow: "Time Amarelo",
       choose_team: "Escolha seu time",
       choose_team_desc: "Entre no placar selecionando seu time agora.",
+      status_in_progress: "Em andamento",
+      status_closed: "Encerrada",
+      share_invite_help:
+        "Copie o link acima e mande para seus amigos. A corrida começa quando houver 2 pessoas na mesa.",
       cooldown_messages: [
         "Respira campeão, isso não é maratona.",
         "Já pensou em mastigar?",
@@ -478,6 +482,10 @@ export const translations = {
       team_yellow: "Yellow Team",
       choose_team: "Choose your team",
       choose_team_desc: "Join the scoreboard by picking a team now.",
+      status_in_progress: "In progress",
+      status_closed: "Ended",
+      share_invite_help:
+        "Copy the link above and send it to your friends. The race starts when there are 2 people at the table.",
       cooldown_messages: [
         "Breathe champion, it's not a marathon.",
         "Have you thought about chewing?",
@@ -846,6 +854,10 @@ export const translations = {
       team_yellow: "Équipe jaune",
       choose_team: "Choisissez votre équipe",
       choose_team_desc: "Rejoignez le classement en choisissant votre équipe.",
+      status_in_progress: "En cours",
+      status_closed: "Terminée",
+      share_invite_help:
+        "Copiez le lien ci-dessus et envoyez-le à vos amis. La course commence quand il y a 2 personnes à table.",
       cooldown_messages: [
         "Respire champion, ce n’est pas un marathon.",
         "Tu as pensé à mâcher ?",
@@ -1216,6 +1228,10 @@ export const translations = {
       team_yellow: "Equipo Amarillo",
       choose_team: "Elige tu equipo",
       choose_team_desc: "Únete al marcador eligiendo tu equipo ahora.",
+      status_in_progress: "En curso",
+      status_closed: "Finalizada",
+      share_invite_help:
+        "Copia el enlace de arriba y envíalo a tus amigos. La carrera comienza cuando haya 2 personas en la mesa.",
       cooldown_messages: [
         "Respira campeón, esto no es un maratón.",
         "¿Has pensado en masticar?",

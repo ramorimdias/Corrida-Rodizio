@@ -75,6 +75,9 @@ export default function Home() {
     }
   };
 
+  const formatAccountLabel = (value: string) =>
+    value.length > 16 ? `${value.slice(0, 16)}...` : value;
+
   const toggleHistory = () => {
     if (!showHistory && myGroups.length === 0) {
       handleLoadGroups();
@@ -732,10 +735,10 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={toggleAccountOverlay}
-                  className="inline-flex items-center rounded-xl border border-muted/60 bg-background/80 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground backdrop-blur transition hover:border-primary/40 hover:text-primary"
+                  className="inline-flex items-center rounded-xl border border-muted/60 bg-background/80 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground backdrop-blur transition hover:border-primary/40 hover:text-primary whitespace-nowrap"
                 >
                   <Settings className="mr-2 h-3.5 w-3.5" />
-                  {t.common.connected_as} &quot;{loginCode}&quot;
+                  {formatAccountLabel(loginCode)}
                 </button>
               ) : null
             }
