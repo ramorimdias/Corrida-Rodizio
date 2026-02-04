@@ -253,11 +253,11 @@ export function AccountSection({
                           <p className="text-sm font-bold">{group.name}</p>
                           {group.is_active ? (
                             <span className="text-[8px] bg-orange-200/60 text-orange-700 dark:bg-purple-500/30 dark:text-purple-200 px-1.5 py-0.5 rounded uppercase font-black">
-                              Em andamento
+                              {t.room.status_in_progress}
                             </span>
                           ) : (
                             <span className="text-[8px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground uppercase font-black">
-                              Encerrada
+                              {t.room.status_closed}
                             </span>
                           )}
                         </div>
